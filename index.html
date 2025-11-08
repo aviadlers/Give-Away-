@@ -1,22 +1,1628 @@
-// Add input validation with visual feedback
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Adlers Giveaway Picker - Premium</title>
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<meta name="theme-color" content="#C47E2C">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<style>
+:root {
+    --primary: #C47E2C;
+    --secondary: #F59E0B;
+    --accent: #10B981;
+    --dark: #1F2937;
+    --light: #FFF8F0;
+}
+
+* {
+    font-family: 'Poppins', sans-serif;
+}
+
+body { 
+    transition: all 0.3s ease; 
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+}
+
+body.dark-mode {
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+}
+
+.container-glass {
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 20px;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+}
+
+.dark-mode .container-glass {
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#wheelCanvas { 
+    border: 8px solid var(--primary); 
+    border-radius: 50%; 
+    margin: 20px auto; 
+    display: block; 
+    background: var(--light);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    max-width: 100%;
+}
+
+#winnerDisplay { 
+    transition: all 0.5s ease; 
+    background: linear-gradient(135deg, #10B981, #34D399);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+#winnerDisplay.glow { 
+    animation: winnerPulse 2s infinite;
+    text-shadow: 0 0 30px #10B981;
+}
+
+@keyframes winnerPulse {
+    0%, 100% { transform: scale(1.1); }
+    50% { transform: scale(1.2); }
+}
+
+.btn-premium {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    border: none;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 50px;
+    font-weight: 600;
+    box-shadow: 0 4px 15px rgba(196, 126, 44, 0.4);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.btn-premium::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    transition: 0.5s;
+}
+
+.btn-premium:hover::before {
+    left: 100%;
+}
+
+.btn-premium:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(196, 126, 44, 0.6);
+}
+
+.btn-premium:active {
+    transform: translateY(-1px);
+}
+
+.btn-premium:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-premium:disabled:hover::before {
+    left: -100%;
+}
+
+.input-modern {
+    border: 2px solid transparent;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 12px;
+    padding: 12px 16px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+}
+
+.input-modern:focus {
+    border-color: var(--primary);
+    background: white;
+    box-shadow: 0 4px 20px rgba(196, 126, 44, 0.3);
+    transform: translateY(-2px);
+    outline: none;
+}
+
+.dark-mode .input-modern {
+    background: rgba(55, 65, 81, 0.9);
+    color: white;
+}
+
+.dark-mode .input-modern:focus {
+    background: #374151;
+}
+
+.card-modern {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.dark-mode .card-modern {
+    background: #374151;
+    border: 1px solid #4B5563;
+}
+
+.card-modern:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+}
+
+.participant-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    margin: 8px 0;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    border-left: 4px solid var(--primary);
+}
+
+.participant-item:hover {
+    transform: translateX(5px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+.dark-mode .participant-item {
+    background: #4B5563;
+}
+
+.winner-badge {
+    background: linear-gradient(135deg, #10B981, #34D399);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.8em;
+    font-weight: 600;
+    animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.loading-spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid var(--primary);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin: 20px auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.floating-element {
+    animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+
+.gradient-text {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.tab-active {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+    border-radius: 12px;
+    transform: scale(1.05);
+}
+
+.stats-card {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+}
+
+.progress-bar {
+    background: #E5E7EB;
+    border-radius: 10px;
+    height: 8px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    height: 100%;
+    border-radius: 10px;
+    transition: width 0.5s ease;
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.input-error {
+    border-color: #ef4444 !important;
+    background-color: #fef2f2 !important;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .mobile-stack {
+        flex-direction: column;
+    }
+    .mobile-stack > * {
+        margin-bottom: 0.5rem;
+        width: 100%;
+    }
+    
+    #wheelCanvas {
+        width: 300px;
+        height: 300px;
+    }
+    
+    .btn-premium {
+        padding: 10px 16px;
+        font-size: 14px;
+    }
+    
+    .container-glass {
+        padding: 16px;
+    }
+}
+
+body.loading {
+    cursor: wait;
+}
+
+body.loading * {
+    pointer-events: none;
+}
+</style>
+</head>
+<body class="min-h-screen py-8">
+
+<div class="max-w-6xl mx-auto px-4">
+    <!-- Header Section -->
+    <div class="text-center mb-8 floating-element">
+        <h1 class="text-5xl font-bold gradient-text mb-4">🎉 Adler's Giveaway Picker</h1>
+        <p class="text-xl text-white opacity-90">The Ultimate Tool for Fair & Exciting Giveaways!</p>
+    </div>
+
+    <!-- Messages Container -->
+    <div id="messagesContainer" class="mb-4"></div>
+
+    <!-- Main Container -->
+    <div class="container-glass p-6 mb-8">
+        <!-- Navigation Tabs -->
+        <div class="flex space-x-2 mb-6 bg-white/30 rounded-2xl p-2">
+            <button class="flex-1 py-3 px-4 text-center font-semibold rounded-xl transition-all tab-active" data-tab="participants">
+                <i class="fas fa-users mr-2"></i>Participants
+            </button>
+            <button class="flex-1 py-3 px-4 text-center font-semibold rounded-xl transition-all text-white/80 hover:text-white" data-tab="winners">
+                <i class="fas fa-trophy mr-2"></i>Winners
+            </button>
+            <button class="flex-1 py-3 px-4 text-center font-semibold rounded-xl transition-all text-white/80 hover:text-white" data-tab="analytics">
+                <i class="fas fa-chart-bar mr-2"></i>Analytics
+            </button>
+        </div>
+
+        <!-- Stats Overview -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <div class="stats-card">
+                <i class="fas fa-users text-3xl mb-2"></i>
+                <h3 class="text-2xl font-bold" id="totalParticipants">0</h3>
+                <p class="text-white/80">Total Participants</p>
+            </div>
+            <div class="stats-card" style="background: linear-gradient(135deg, #f093fb, #f5576c);">
+                <i class="fas fa-trophy text-3xl mb-2"></i>
+                <h3 class="text-2xl font-bold" id="totalWinners">0</h3>
+                <p class="text-white/80">Winners Selected</p>
+            </div>
+            <div class="stats-card" style="background: linear-gradient(135deg, #4facfe, #00f2fe);">
+                <i class="fas fa-calendar text-3xl mb-2"></i>
+                <h3 class="text-2xl font-bold" id="activeGiveaways">1</h3>
+                <p class="text-white/80">Active Giveaways</p>
+            </div>
+            <div class="stats-card" style="background: linear-gradient(135deg, #43e97b, #38f9d7);">
+                <i class="fas fa-gift text-3xl mb-2"></i>
+                <h3 class="text-2xl font-bold" id="totalEntries">0</h3>
+                <p class="text-white/80">Total Entries</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Left Column - Controls -->
+            <div class="space-y-6">
+                <!-- Theme & Actions -->
+                <div class="flex justify-between items-center mobile-stack">
+                    <button id="themeToggle" class="btn-premium">
+                        <i class="fas fa-moon mr-2"></i>Toggle Theme
+                    </button>
+                    <button id="bulkDeleteBtn" class="btn-premium" style="background: linear-gradient(135deg, #ef4444, #f97316);">
+                        <i class="fas fa-trash mr-2"></i>Clear All
+                    </button>
+                </div>
+
+                <!-- Channel Management -->
+                <div class="card-modern">
+                    <h2 class="text-xl font-bold gradient-text mb-4">
+                        <i class="fas fa-play-circle mr-2"></i>Channel Setup
+                    </h2>
+                    <div class="space-y-4">
+                        <input id="channelLink" type="url" class="input-modern" placeholder="🎬 Enter video/channel URL">
+                        <button id="addChannelBtn" class="btn-premium w-full">
+                            <i class="fas fa-plus mr-2"></i>Add Channel
+                        </button>
+                        <select id="channelSelect" class="input-modern">
+                            <option value="">Select a channel...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Participant Entry -->
+                <div class="card-modern">
+                    <h2 class="text-xl font-bold gradient-text mb-4">
+                        <i class="fas fa-user-plus mr-2"></i>Add Participants
+                    </h2>
+                    <div class="space-y-3">
+                        <input id="participantName" type="text" class="input-modern" placeholder="👤 Participant Name">
+                        <input id="participantAvatar" type="url" class="input-modern" placeholder="🖼️ Avatar URL (Optional)">
+                        <div class="flex space-x-3 mobile-stack">
+                            <input id="participantEntries" type="number" class="input-modern" placeholder="🎟️ Entries" min="1" value="1">
+                            <button id="addParticipantBtn" class="btn-premium">
+                                <i class="fas fa-plus mr-2"></i>Add
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CSV Upload -->
+                <div class="card-modern">
+                    <h2 class="text-xl font-bold gradient-text mb-4">
+                        <i class="fas fa-file-csv mr-2"></i>Bulk Import
+                    </h2>
+                    <input id="csvUpload" type="file" accept=".csv" class="input-modern">
+                    <div id="loadingIndicator" class="hidden mt-3">
+                        <div class="loading-spinner"></div>
+                        <p class="text-center text-white font-semibold">Processing CSV...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column - Wheel & Results -->
+            <div class="space-y-6">
+                <!-- Wheel Container -->
+                <div class="card-modern text-center">
+                    <h2 class="text-xl font-bold gradient-text mb-4">
+                        <i class="fas fa-sync-alt mr-2"></i>Giveaway Wheel
+                    </h2>
+                    
+                    <!-- Segment Colors -->
+                    <div class="mb-4">
+                        <label class="font-semibold text-white">Segment Colors:</label>
+                        <input id="segmentColors" type="text" class="input-modern mt-2" 
+                               placeholder="#FDE68A,#FBBF24,#C47E2C,#F59E0B" 
+                               value="#FDE68A,#FBBF24,#C47E2C,#F59E0B">
+                    </div>
+                    
+                    <!-- Wheel Pointer -->
+                    <div class="relative flex justify-center">
+                        <div class="wheel-pointer absolute top-0 z-10">
+                            <i class="fas fa-caret-down text-4xl text-red-500" style="text-shadow: 0 2px 10px rgba(0,0,0,0.3);"></i>
+                        </div>
+                        <canvas id="wheelCanvas" width="400" height="400"></canvas>
+                    </div>
+
+                    <!-- Spin Controls -->
+                    <div class="mt-6 space-y-4">
+                        <div class="flex space-x-3 justify-center mobile-stack">
+                            <input id="winnersCount" type="number" class="input-modern w-32 text-center" placeholder="Winners" min="1" max="10" value="1">
+                            <button id="spinBtn" class="btn-premium px-8">
+                                <i class="fas fa-play mr-2"></i>Spin Wheel
+                            </button>
+                        </div>
+                        
+                        <!-- Schedule Section -->
+                        <div class="bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl p-4">
+                            <h3 class="text-white font-semibold mb-2">
+                                <i class="fas fa-clock mr-2"></i>Schedule Giveaway
+                            </h3>
+                            <div class="flex space-x-2 mobile-stack">
+                                <input type="datetime-local" id="scheduledTime" class="input-modern">
+                                <button id="scheduleBtn" class="btn-premium bg-white/20 backdrop-blur-sm">
+                                    <i class="fas fa-calendar-check mr-2"></i>Schedule
+                                </button>
+                            </div>
+                            <div id="countdown" class="text-white font-bold mt-2 text-sm"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Winner Display -->
+                <div id="winnerDisplay" class="card-modern text-center min-h-[100px] flex items-center justify-center">
+                    <p class="text-gray-500">Spin the wheel to reveal a winner!</p>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="grid grid-cols-2 gap-3">
+                    <button id="generateImageBtn" class="btn-premium py-3" style="background: linear-gradient(135deg, #10B981, #34D399);">
+                        <i class="fas fa-image mr-2"></i>Winner Image
+                    </button>
+                    <button id="copyWinnerBtn" class="btn-premium py-3" style="background: linear-gradient(135deg, #3B82F6, #60A5FA);">
+                        <i class="fas fa-copy mr-2"></i>Copy Winner
+                    </button>
+                    <button id="showLeaderboard" class="btn-premium py-3" style="background: linear-gradient(135deg, #8B5CF6, #A78BFA);">
+                        <i class="fas fa-chart-line mr-2"></i>Leaderboard
+                    </button>
+                    <button id="exportStats" class="btn-premium py-3" style="background: linear-gradient(135deg, #F59E0B, #FBBF24);">
+                        <i class="fas fa-download mr-2"></i>Export CSV
+                    </button>
+                    <button id="exportParticipantsBtn" class="btn-premium py-3 col-span-2" style="background: linear-gradient(135deg, #6366F1, #8B5CF6);">
+                        <i class="fas fa-file-export mr-2"></i>Export Participants
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Participants & Winners Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        <!-- Participants List -->
+        <div class="container-glass p-6">
+            <h2 class="text-2xl font-bold gradient-text mb-4">
+                <i class="fas fa-list mr-2"></i>Participants
+                <span id="participantCount" class="text-white/70 text-lg">(0)</span>
+            </h2>
+            <div class="max-h-96 overflow-y-auto space-y-2" id="participantsList">
+                <!-- Participants will be dynamically added here -->
+            </div>
+        </div>
+
+        <!-- Winners History -->
+        <div class="container-glass p-6">
+            <h2 class="text-2xl font-bold gradient-text mb-4">
+                <i class="fas fa-trophy mr-2"></i>Winner History
+            </h2>
+            <div class="max-h-96 overflow-y-auto space-y-2" id="winnersList">
+                <!-- Winners will be dynamically added here -->
+            </div>
+            <button id="clearHistory" class="btn-premium w-full mt-4" style="background: linear-gradient(135deg, #ef4444, #f97316);">
+                <i class="fas fa-broom mr-2"></i>Clear History
+            </button>
+        </div>
+    </div>
+
+    <!-- Leaderboard Section (Hidden by default) -->
+    <div id="leaderboardSection" class="container-glass p-6 mb-8 hidden">
+        <h2 class="text-2xl font-bold gradient-text mb-4">
+            <i class="fas fa-chart-line mr-2"></i>Leaderboard
+        </h2>
+        <div class="max-h-96 overflow-y-auto space-y-2" id="leaderboardList">
+            <!-- Leaderboard will be dynamically added here -->
+        </div>
+    </div>
+
+    <!-- Share Canvas (Hidden by default) -->
+    <div class="text-center mb-8">
+        <canvas id="shareCanvas" width="600" height="400" class="border-2 border-dashed border-white/30 rounded-2xl hidden mx-auto"></canvas>
+    </div>
+</div>
+
+<!-- Confetti Canvas -->
+<canvas id="confettiCanvas" class="fixed top-0 left-0 w-full h-full pointer-events-none z-50"></canvas>
+
+<!-- Screen Reader Announcements -->
+<div id="liveAnnouncement" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+
+<!-- Sounds -->
+<audio id="drumrollSound" preload="auto">
+    <source src="https://www.myinstants.com/media/sounds/drum-roll.mp3" type="audio/mpeg">
+</audio>
+<audio id="cheerSound" preload="auto">
+    <source src="https://www.myinstants.com/media/sounds/applause.mp3" type="audio/mpeg">
+</audio>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<script>
+// ======================== Utility Functions ========================
+function sanitizeInput(input) {
+    const div = document.createElement('div');
+    div.textContent = input;
+    return div.innerHTML;
+}
+
+function isValidUrl(string) {
+    try {
+        new URL(string);
+        return true;
+    } catch (_) {
+        return false;
+    }
+}
+
+function showMessage(message, type = 'info') {
+    const container = document.getElementById('messagesContainer');
+    const messageEl = document.createElement('div');
+    messageEl.className = type === 'error' ? 'bg-red-100 border border-red-300 text-red-700 px-4 py-3 rounded mb-4' : 
+                         type === 'success' ? 'bg-green-100 border border-green-300 text-green-700 px-4 py-3 rounded mb-4' : 
+                         'bg-blue-100 border border-blue-300 text-blue-700 px-4 py-3 rounded mb-4';
+    messageEl.textContent = message;
+    container.appendChild(messageEl);
+    
+    setTimeout(() => {
+        messageEl.remove();
+    }, 5000);
+}
+
+function announceToScreenReader(message) {
+    const announcement = document.getElementById('liveAnnouncement');
+    announcement.textContent = message;
+}
+
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+function darkenColor(color, percent) {
+    const num = parseInt(color.replace("#", ""), 16);
+    const amt = Math.round(2.55 * percent);
+    const R = Math.max(0, (num >> 16) - amt);
+    const G = Math.max(0, (num >> 8 & 0x00FF) - amt);
+    const B = Math.max(0, (num & 0x0000FF) - amt);
+    return "#" + (0x1000000 + R * 0x10000 + G * 0x100 + B).toString(16).slice(1);
+}
+
+function playSound(audioElement) {
+    audioElement.play().catch(error => {
+        console.log('Audio play failed:', error);
+        if (error.name === 'NotAllowedError') {
+            showMessage('Click anywhere on the page to enable sounds', 'info');
+        }
+    });
+}
+
+function setLoadingState(isLoading, element = null) {
+    if (isLoading) {
+        document.body.classList.add('loading');
+        if (element) {
+            element.disabled = true;
+            const originalText = element.innerHTML;
+            element.setAttribute('data-original-text', originalText);
+            element.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Loading...';
+        }
+    } else {
+        document.body.classList.remove('loading');
+        if (element) {
+            element.disabled = false;
+            const originalText = element.getAttribute('data-original-text');
+            if (originalText) element.innerHTML = originalText;
+        }
+    }
+}
+
+function ensureDBReady() {
+    return new Promise((resolve) => {
+        if (db) resolve(db);
+        else setTimeout(() => ensureDBReady().then(resolve), 100);
+    });
+}
+
+// ======================== IndexedDB Setup ========================
+let db;
+let wheelRedrawPending = false;
+let wheelParticipants = [];
+let spinning = false;
+let selectedChannel = "";
+let scheduledTimeout = false;
+
+function initDB() {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open("GiveawayDB", 2);
+        
+        request.onerror = () => {
+            showMessage('Failed to open database', 'error');
+            reject(request.error);
+        };
+        
+        request.onupgradeneeded = (e) => {
+            db = e.target.result;
+            try {
+                if (!db.objectStoreNames.contains("participants")) {
+                    db.createObjectStore("participants", { keyPath: "id", autoIncrement: true })
+                      .createIndex("channelLink", "channelLink", { unique: false });
+                }
+                if (!db.objectStoreNames.contains("winners")) {
+                    db.createObjectStore("winners", { keyPath: "id", autoIncrement: true });
+                }
+                if (!db.objectStoreNames.contains("channels")) {
+                    db.createObjectStore("channels", { keyPath: "link" });
+                }
+            } catch (error) {
+                showMessage('Database upgrade failed: ' + error.message, 'error');
+            }
+        };
+        
+        request.onsuccess = (e) => {
+            db = e.target.result;
+            loadChannels();
+            loadParticipants();
+            loadWinners();
+            updateStats();
+            resolve(db);
+        };
+    });
+}
+
+function handleDBError(error, operation) {
+    console.error(`Database ${operation} error:`, error);
+    showMessage(`Database error during ${operation}: ${error.message}`, 'error');
+}
+
+// ======================== DOM Elements ========================
+const addChannelBtn = document.getElementById("addChannelBtn");
+const channelLinkInput = document.getElementById("channelLink");
+const channelSelect = document.getElementById("channelSelect");
+const addParticipantBtn = document.getElementById("addParticipantBtn");
+const participantName = document.getElementById("participantName");
+const participantAvatar = document.getElementById("participantAvatar");
+const participantEntriesInput = document.getElementById("participantEntries");
+const participantsList = document.getElementById("participantsList");
+const participantCount = document.getElementById("participantCount");
+const spinBtn = document.getElementById("spinBtn");
+const winnersCountInput = document.getElementById("winnersCount");
+const winnerDisplay = document.getElementById("winnerDisplay");
+const winnersList = document.getElementById("winnersList");
+const clearHistoryBtn = document.getElementById("clearHistory");
+const csvUpload = document.getElementById("csvUpload");
+const drumrollSound = document.getElementById("drumrollSound");
+const cheerSound = document.getElementById("cheerSound");
+const wheelCanvas = document.getElementById("wheelCanvas");
+const wheelCtx = wheelCanvas.getContext("2d");
+const shareCanvas = document.getElementById("shareCanvas");
+const shareCtx = shareCanvas.getContext("2d");
+const generateImageBtn = document.getElementById("generateImageBtn");
+const copyWinnerBtn = document.getElementById("copyWinnerBtn");
+const themeToggle = document.getElementById("themeToggle");
+const scheduleBtn = document.getElementById("scheduleBtn");
+const countdownElem = document.getElementById("countdown");
+const bulkDeleteBtn = document.getElementById("bulkDeleteBtn");
+const showLeaderboardBtn = document.getElementById("showLeaderboard");
+const exportStatsBtn = document.getElementById("exportStats");
+const exportParticipantsBtn = document.getElementById("exportParticipantsBtn");
+const leaderboardSection = document.getElementById("leaderboardSection");
+const leaderboardList = document.getElementById("leaderboardList");
+const segmentColorsInput = document.getElementById("segmentColors");
+
+// ======================== Theme Toggle ========================
+themeToggle.onclick = () => {
+    document.body.classList.toggle("dark-mode");
+    const isDark = document.body.classList.contains("dark-mode");
+    showMessage(`${isDark ? 'Dark' : 'Light'} mode activated`, 'success');
+    drawWheel();
+};
+
+// ======================== Tab Navigation ========================
+document.querySelectorAll('[data-tab]').forEach(tab => {
+    tab.addEventListener('click', function() {
+        document.querySelectorAll('[data-tab]').forEach(t => {
+            t.classList.remove('tab-active', 'text-white');
+            t.classList.add('text-white/80');
+        });
+        
+        this.classList.add('tab-active', 'text-white');
+        this.classList.remove('text-white/80');
+        
+        const tabName = this.getAttribute('data-tab');
+        if (tabName === 'winners') {
+            loadWinners();
+        } else if (tabName === 'analytics') {
+            showLeaderboard();
+            leaderboardSection.classList.remove('hidden');
+        } else {
+            leaderboardSection.classList.add('hidden');
+        }
+    });
+});
+
+// ======================== Channel Management ========================
+addChannelBtn.onclick = () => {
+    const link = channelLinkInput.value.trim();
+    if (!link) {
+        showMessage('Please enter a channel link', 'error');
+        return;
+    }
+    
+    if (!isValidUrl(link)) {
+        showMessage('Please enter a valid URL', 'error');
+        return;
+    }
+    
+    const transaction = db.transaction("channels", "readwrite");
+    const store = transaction.objectStore("channels");
+    
+    transaction.onerror = () => handleDBError(transaction.error, 'add channel');
+    transaction.oncomplete = () => {
+        channelLinkInput.value = "";
+        loadChannels();
+        showMessage('Channel added successfully', 'success');
+    };
+    
+    store.put({ link: sanitizeInput(link) });
+};
+
+channelSelect.onchange = () => { 
+    selectedChannel = channelSelect.value; 
+    loadParticipants(); 
+    showMessage(`Switched to channel: ${selectedChannel}`, 'success');
+};
+
+function loadChannels() {
+    channelSelect.innerHTML = '<option value="">Select a channel...</option>';
+    const transaction = db.transaction("channels", "readonly");
+    const store = transaction.objectStore("channels");
+    
+    store.getAll().onsuccess = (e) => {
+        const channels = e.target.result;
+        channels.forEach(c => {
+            const option = document.createElement("option"); 
+            option.value = c.link; 
+            option.textContent = c.link; 
+            channelSelect.appendChild(option);
+        });
+        
+        if (channels.length > 0 && !selectedChannel) {
+            selectedChannel = channelSelect.value;
+            loadParticipants();
+        }
+    };
+}
+
+// ======================== Participant Management ========================
+function isDuplicateParticipant(name) {
+    return wheelParticipants.some(p => 
+        p.name.toLowerCase() === name.toLowerCase()
+    );
+}
+
+addParticipantBtn.onclick = () => {
+    const name = sanitizeInput(participantName.value.trim());
+    const avatar = participantAvatar.value.trim();
+    const entries = parseInt(participantEntriesInput.value) || 1;
+    
+    if (!name) {
+        showMessage('Please enter a participant name', 'error');
+        return;
+    }
+    
+    if (!selectedChannel) {
+        showMessage('Please select a channel first', 'error');
+        return;
+    }
+    
+    if (avatar && !isValidUrl(avatar)) {
+        showMessage('Please enter a valid avatar URL', 'error');
+        return;
+    }
+    
+    if (isDuplicateParticipant(name)) {
+        showMessage('Participant already exists', 'error');
+        return;
+    }
+    
+    setLoadingState(true, addParticipantBtn);
+    
+    const transaction = db.transaction("participants", "readwrite");
+    const store = transaction.objectStore("participants");
+    
+    transaction.onerror = () => {
+        handleDBError(transaction.error, 'add participant');
+        setLoadingState(false, addParticipantBtn);
+    };
+    
+    transaction.oncomplete = () => {
+        participantName.value = ""; 
+        participantAvatar.value = ""; 
+        participantEntriesInput.value = 1;
+        loadParticipants();
+        showMessage(`Added participant: ${name}`, 'success');
+        setLoadingState(false, addParticipantBtn);
+    };
+    
+    store.add({
+        name, 
+        avatarURL: avatar, 
+        channelLink: selectedChannel, 
+        entries
+    });
+};
+
+bulkDeleteBtn.onclick = () => {
+    if (!selectedChannel) {
+        showMessage('Please select a channel first', 'error');
+        return;
+    }
+    
+    if (!confirm('Are you sure you want to delete ALL participants for this channel?')) {
+        return;
+    }
+    
+    setLoadingState(true, bulkDeleteBtn);
+    
+    const transaction = db.transaction("participants", "readwrite");
+    const store = transaction.objectStore("participants");
+    const index = store.index("channelLink");
+    
+    const request = index.getAll(selectedChannel);
+    request.onsuccess = () => {
+        const participants = request.result;
+        const deleteTransaction = db.transaction("participants", "readwrite");
+        const deleteStore = deleteTransaction.objectStore("participants");
+        
+        participants.forEach(participant => {
+            deleteStore.delete(participant.id);
+        });
+        
+        deleteTransaction.oncomplete = () => {
+            loadParticipants();
+            showMessage('All participants deleted', 'success');
+            setLoadingState(false, bulkDeleteBtn);
+        };
+        
+        deleteTransaction.onerror = () => {
+            handleDBError(deleteTransaction.error, 'delete participants');
+            setLoadingState(false, bulkDeleteBtn);
+        };
+    };
+};
+
+csvUpload.addEventListener("change", function() {
+    const file = csvUpload.files[0]; 
+    if (!file || !selectedChannel) {
+        showMessage('Please select a file and channel first', 'error');
+        return;
+    }
+    
+    document.getElementById("loadingIndicator").classList.remove("hidden");
+    const reader = new FileReader();
+    
+    reader.onload = (e) => {
+        const lines = e.target.result.split("\n");
+        let added = 0, duplicates = 0, errors = 0;
+        
+        const transaction = db.transaction("participants", "readwrite");
+        const store = transaction.objectStore("participants");
+        
+        transaction.onerror = () => {
+            handleDBError(transaction.error, 'CSV import');
+            document.getElementById("loadingIndicator").classList.add("hidden");
+        };
+        
+        lines.forEach((line, index) => {
+            if (!line.trim()) return;
+            
+            const [name, avatar, entries] = line.split(",");
+            const sanitizedName = sanitizeInput(name.trim());
+            
+            if (!sanitizedName) {
+                errors++;
+                return;
+            }
+            
+            if (isDuplicateParticipant(sanitizedName)) {
+                duplicates++;
+                return;
+            }
+            
+            store.add({
+                name: sanitizedName,
+                avatarURL: (avatar || "").trim(),
+                channelLink: selectedChannel,
+                entries: parseInt(entries) || 1
+            });
+            added++;
+        });
+        
+        transaction.oncomplete = () => {
+            setTimeout(() => {
+                loadParticipants();
+                document.getElementById("loadingIndicator").classList.add("hidden");
+                csvUpload.value = '';
+                showMessage(`CSV import complete: ${added} added, ${duplicates} duplicates skipped, ${errors} errors`, 'success');
+            }, 200);
+        };
+    };
+    
+    reader.onerror = () => {
+        document.getElementById("loadingIndicator").classList.add("hidden");
+        showMessage('Error reading file', 'error');
+    };
+    
+    reader.readAsText(file);
+});
+
+function loadParticipants() {
+    participantsList.innerHTML = ""; 
+    wheelParticipants = [];
+    
+    if (!selectedChannel) {
+        participantCount.textContent = '(0)';
+        updateStats();
+        drawWheel();
+        return;
+    }
+    
+    const transaction = db.transaction("participants", "readonly");
+    const store = transaction.objectStore("participants");
+    const index = store.index("channelLink");
+    
+    index.getAll(selectedChannel).onsuccess = (e) => {
+        const participants = e.target.result;
+        participantCount.textContent = `(${participants.length})`;
+        
+        if (participants.length === 0) {
+            participantsList.innerHTML = `
+                <div class="text-center py-8 text-white/70">
+                    <i class="fas fa-users text-4xl mb-4"></i>
+                    <p>No participants yet</p>
+                    <p class="text-sm">Add participants to get started</p>
+                </div>
+            `;
+        } else {
+            participants.forEach(p => {
+                const participantEl = document.createElement("div");
+                participantEl.className = "participant-item";
+                participantEl.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center text-white font-bold">
+                            ${p.name.charAt(0).toUpperCase()}
+                        </div>
+                        <div>
+                            <div class="font-semibold">${p.name}</div>
+                            <div class="text-sm text-gray-500">${p.entries} entries</div>
+                        </div>
+                    </div>
+                `;
+                participantsList.appendChild(participantEl);
+                
+                for (let i = 0; i < p.entries; i++) {
+                    wheelParticipants.push(p);
+                }
+            });
+        }
+        
+        updateStats();
+        scheduleWheelRedraw();
+    };
+}
+
+// ======================== Wheel Drawing ========================
+function scheduleWheelRedraw() {
+    if (!wheelRedrawPending) {
+        wheelRedrawPending = true;
+        requestAnimationFrame(() => {
+            drawWheel();
+            wheelRedrawPending = false;
+        });
+    }
+}
+
+function drawWheel() {
+    const ctx = wheelCtx, size = wheelCanvas.width, radius = size / 2;
+    ctx.clearRect(0, 0, size, size);
+    const count = wheelParticipants.length; 
+    if (count === 0) {
+        ctx.fillStyle = document.body.classList.contains("dark-mode") ? '#374151' : '#F3F4F6';
+        ctx.beginPath();
+        ctx.arc(radius, radius, radius, 0, 2 * Math.PI);
+        ctx.fill();
+        
+        ctx.fillStyle = document.body.classList.contains("dark-mode") ? '#9CA3AF' : '#6B7280';
+        ctx.font = '16px Poppins';
+        ctx.textAlign = 'center';
+        ctx.fillText('Add participants to begin', radius, radius);
+        return;
+    }
+    
+    const angle = (2 * Math.PI) / count;
+    const colorInput = segmentColorsInput.value.trim();
+    const colors = colorInput ? colorInput.split(",") : ["#FDE68A", "#FBBF24", "#C47E2C", "#F59E0B"];
+    
+    wheelParticipants.forEach((p, i) => {
+        const startAngle = i * angle;
+        const endAngle = (i + 1) * angle;
+        
+        const gradient = ctx.createRadialGradient(
+            radius, radius, 0,
+            radius, radius, radius
+        );
+        
+        gradient.addColorStop(0, colors[i % colors.length]);
+        gradient.addColorStop(1, darkenColor(colors[i % colors.length], 20));
+        
+        ctx.beginPath(); 
+        ctx.moveTo(radius, radius); 
+        ctx.arc(radius, radius, radius, startAngle, endAngle);
+        ctx.fillStyle = gradient; 
+        ctx.fill(); 
+        
+        ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        
+        ctx.save(); 
+        ctx.translate(radius, radius); 
+        ctx.rotate(startAngle + angle / 2);
+        ctx.textAlign = "right"; 
+        ctx.fillStyle = document.body.classList.contains("dark-mode") ? "#F3F4F6" : "#1F2937"; 
+        ctx.font = "bold 12px Poppins"; 
+        
+        const maxLength = 15;
+        const displayName = p.name.length > maxLength ? p.name.substring(0, maxLength) + "..." : p.name;
+        ctx.fillText(displayName, radius - 25, 0);
+        ctx.restore();
+    });
+    
+    ctx.beginPath();
+    ctx.arc(radius, radius, 20, 0, 2 * Math.PI);
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fill();
+    ctx.strokeStyle = '#C47E2C';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+}
+
+// ======================== Spin Logic ========================
+const debouncedSpin = debounce(() => {
+    if (spinning || wheelParticipants.length === 0) return;
+    
+    spinning = true;
+    spinBtn.disabled = true;
+    spinBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Spinning...';
+    
+    playSound(drumrollSound);
+    
+    const winnersCount = Math.min(parseInt(winnersCountInput.value) || 1, 10);
+    let tempParticipants = [...wheelParticipants];
+    let winners = [];
+    
+    function pickWinner() {
+        return new Promise(resolve => {
+            const start = 0;
+            const target = Math.random() * 2 * Math.PI + 6 * Math.PI;
+            const duration = 3000;
+            const startTime = performance.now();
+            
+            function animate(now) {
+                let t = (now - startTime) / duration;
+                if (t > 1) t = 1;
+                const eased = 1 - Math.pow(1 - t, 3);
+                wheelCanvas.style.transform = `rotate(${eased * target}rad)`;
+                
+                if (t < 1) {
+                    requestAnimationFrame(animate);
+                } else {
+                    const winnerIndex = Math.floor(Math.random() * tempParticipants.length);
+                    const winner = tempParticipants[winnerIndex];
+                    winners.push(winner);
+                    
+                    announceWinner(winner);
+                    winnerDisplay.classList.add("glow");
+                    
+                    announceToScreenReader(`Winner selected: ${winner.name}`);
+                    
+                    setTimeout(() => winnerDisplay.classList.remove("glow"), 2000);
+                    tempParticipants = tempParticipants.filter(p => p.name !== winner.name);
+                    
+                    confetti({ particleCount: 150, spread: 60, origin: { y: 0.6 } });
+                    playSound(cheerSound);
+                    
+                    const transaction = db.transaction("winners", "readwrite");
+                    const store = transaction.objectStore("winners");
+                    store.add({
+                        ...winner,
+                        date: new Date()
+                    });
+                    
+                    transaction.oncomplete = () => {
+                        loadWinners();
+                        updateStats();
+                    };
+                    
+                    setTimeout(resolve, 1500);
+                }
+            }
+            requestAnimationFrame(animate);
+        });
+    }
+    
+    async function pickAllWinners() {
+        for (let n = 0; n < winnersCount; n++) {
+            if (tempParticipants.length === 0) break;
+            await pickWinner();
+        }
+        
+        spinning = false;
+        spinBtn.disabled = false;
+        spinBtn.innerHTML = '<i class="fas fa-play mr-2"></i>Spin Wheel';
+        
+        if (winners.length > 1) {
+            showMessage(`Selected ${winners.length} winners!`, 'success');
+        }
+    }
+    
+    pickAllWinners();
+}, 1000);
+
+spinBtn.onclick = debouncedSpin;
+
+function announceWinner(winner) {
+    winnerDisplay.innerHTML = `
+        <div class="text-center">
+            <div class="floating-element mb-4">
+                <i class="fas fa-crown text-4xl text-yellow-400 mb-2"></i>
+            </div>
+            <div class="text-3xl font-bold mb-2">Congratulations!</div>
+            <div class="text-4xl font-bold gradient-text">${winner.name}</div>
+            <div class="text-lg text-gray-600 mt-2">You are the giveaway winner! 🎉</div>
+        </div>
+    `;
+    
+    confetti({
+        particleCount: 200,
+        spread: 100,
+        origin: { y: 0.6 }
+    });
+    
+    setTimeout(() => confetti({ particleCount: 100, spread: 70, origin: { x: 0.2, y: 0.6 } }), 300);
+    setTimeout(() => confetti({ particleCount: 100, spread: 70, origin: { x: 0.8, y: 0.6 } }), 600);
+}
+
+// ======================== Winner Management ========================
+function loadWinners() {
+    winnersList.innerHTML = "";
+    const transaction = db.transaction("winners", "readonly");
+    const store = transaction.objectStore("winners");
+    
+    store.getAll().onsuccess = (e) => {
+        const winners = e.target.result.slice(-10).reverse();
+        
+        if (winners.length === 0) {
+            winnersList.innerHTML = `
+                <div class="text-center py-8 text-white/70">
+                    <i class="fas fa-trophy text-4xl mb-4"></i>
+                    <p>No winners yet</p>
+                    <p class="text-sm">Spin the wheel to select winners</p>
+                </div>
+            `;
+            return;
+        }
+        
+        winners.forEach(w => {
+            const winnerEl = document.createElement("div");
+            winnerEl.className = "participant-item";
+            winnerEl.innerHTML = `
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full flex items-center justify-center text-white font-bold">
+                        ${w.name.charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                        <div class="font-semibold">${w.name}</div>
+                        <div class="text-sm text-gray-500">${new Date(w.date).toLocaleString()}</div>
+                    </div>
+                </div>
+                <div class="winner-badge">
+                    <i class="fas fa-trophy mr-1"></i>Winner
+                </div>
+            `;
+            winnersList.appendChild(winnerEl);
+        });
+    });
+}
+
+clearHistoryBtn.onclick = () => {
+    if (confirm('Are you sure you want to clear all winner history?')) {
+        setLoadingState(true, clearHistoryBtn);
+        const transaction = db.transaction("winners", "readwrite");
+        const store = transaction.objectStore("winners");
+        store.clear().onsuccess = () => {
+            loadWinners();
+            updateStats();
+            showMessage('Winner history cleared', 'success');
+            setLoadingState(false, clearHistoryBtn);
+        };
+    }
+};
+
+// ======================== Scheduled Giveaway ========================
+scheduleBtn.onclick = () => {
+    const scheduledInput = document.getElementById("scheduledTime").value;
+    if (!scheduledInput) {
+        showMessage('Please select date & time!', 'error');
+        return;
+    }
+    
+    const scheduledDate = new Date(scheduledInput);
+    const now = new Date();
+    const delay = scheduledDate - now;
+    
+    if (delay <= 0) {
+        showMessage('Time must be in future!', 'error');
+        return;
+    }
+    
+    clearTimeout(scheduledTimeout);
+    
+    function updateCountdown() {
+        const diff = scheduledDate - new Date();
+        if (diff <= 0) {
+            countdownElem.textContent = "🎯 Giveaway Live! Spinning now...";
+            announceToScreenReader('Scheduled giveaway starting now');
+            spinBtn.click();
+        } else {
+            const h = Math.floor(diff / (1000 * 60 * 60));
+            const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const s = Math.floor((diff % (1000 * 60)) / 1000);
+            countdownElem.textContent = `Starts in: ${h}h ${m}m ${s}s`;
+            scheduledTimeout = setTimeout(updateCountdown, 1000);
+        }
+    }
+    
+    updateCountdown();
+    showMessage(`Giveaway scheduled for ${scheduledDate.toLocaleString()}`, 'success');
+};
+
+// ======================== Leaderboard & Analytics ========================
+function showLeaderboard() {
+    leaderboardList.innerHTML = "";
+    const transaction = db.transaction("winners", "readonly");
+    const store = transaction.objectStore("winners");
+    
+    store.getAll().onsuccess = (e) => {
+        const tally = {};
+        e.target.result.forEach(w => {
+            tally[w.name] = (tally[w.name] || 0) + 1;
+        });
+        
+        const sorted = Object.entries(tally).sort((a, b) => b[1] - a[1]);
+        if (sorted.length === 0) {
+            leaderboardList.innerHTML = `
+                <div class="text-center py-8 text-white/70">
+                    <i class="fas fa-chart-line text-4xl mb-4"></i>
+                    <p>No leaderboard data yet</p>
+                    <p class="text-sm">Select some winners first</p>
+                </div>
+            `;
+            return;
+        }
+        
+        sorted.forEach(([name, wins], index) => {
+            const leaderEl = document.createElement("div");
+            leaderEl.className = "participant-item";
+            leaderEl.innerHTML = `
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-r from-purple-400 to-pink-500 rounded-full flex items-center justify-center text-white font-bold">
+                        ${index + 1}
+                    </div>
+                    <div>
+                        <div class="font-semibold">${name}</div>
+                        <div class="text-sm text-gray-500">${wins} win${wins > 1 ? 's' : ''}</div>
+                    </div>
+                </div>
+                <div class="text-2xl font-bold text-yellow-400">
+                    ${index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '🏆'}
+                </div>
+            `;
+            leaderboardList.appendChild(leaderEl);
+        });
+    };
+}
+
+showLeaderboardBtn.onclick = () => {
+    showLeaderboard();
+    leaderboardSection.classList.remove('hidden');
+};
+
+exportStatsBtn.onclick = () => {
+    const transaction = db.transaction("winners", "readonly");
+    const store = transaction.objectStore("winners");
+    
+    store.getAll().onsuccess = (e) => {
+        const tally = {};
+        e.target.result.forEach(w => {
+            tally[w.name] = (tally[w.name] || 0) + 1;
+        });
+        
+        let csv = "Name,Wins\n";
+        Object.entries(tally).forEach(([name, wins]) => {
+            csv += `${name},${wins}\n`;
+        });
+        
+        const blob = new Blob([csv], { type: "text/csv" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "giveaway_leaderboard.csv";
+        a.click();
+        showMessage('Leaderboard exported as CSV', 'success');
+    };
+};
+
+exportParticipantsBtn.onclick = () => {
+    if (!selectedChannel) {
+        showMessage('Please select a channel first', 'error');
+        return;
+    }
+    
+    const transaction = db.transaction("participants", "readonly");
+    const store = transaction.objectStore("participants");
+    const index = store.index("channelLink");
+    
+    index.getAll(selectedChannel).onsuccess = (e) => {
+        let csv = "Name,AvatarURL,Entries\n";
+        e.target.result.forEach(p => {
+            csv += `"${p.name}","${p.avatarURL || ''}",${p.entries}\n`;
+        });
+        
+        const blob = new Blob([csv], { type: "text/csv" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "participants_export.csv";
+        a.click();
+        showMessage('Participants exported as CSV', 'success');
+    };
+};
+
+// ======================== Share Features ========================
+generateImageBtn.onclick = () => {
+    const winnerText = winnerDisplay.textContent || winnerDisplay.innerText;
+    if (!winnerText || winnerText.includes('Spin the wheel')) {
+        showMessage('No winner to generate image for', 'error');
+        return;
+    }
+    
+    shareCanvas.classList.remove('hidden');
+    shareCtx.clearRect(0, 0, shareCanvas.width, shareCanvas.height);
+    
+    shareCtx.fillStyle = document.body.classList.contains("dark-mode") ? "#374151" : "#fff8f0";
+    shareCtx.fillRect(0, 0, shareCanvas.width, shareCanvas.height);
+    
+    shareCtx.fillStyle = "#C47E2C";
+    shareCtx.font = "bold 40px Poppins";
+    shareCtx.textAlign = "center";
+    shareCtx.fillText("🎉 Giveaway Winner 🎉", shareCanvas.width / 2, 80);
+    
+    shareCtx.fillStyle = "#10B981";
+    shareCtx.font = "bold 50px Poppins";
+    const winnerName = winnerText.replace("🎉 Winner: ", "").replace(" 🎉", "").split('Congratulations!')[1] || winnerText;
+    shareCtx.fillText(winnerName.trim(), shareCanvas.width / 2, shareCanvas.height / 2);
+    
+    shareCtx.fillStyle = "#6B7280";
+    shareCtx.font = "20px Poppins";
+    shareCtx.fillText("Selected via Adler's Giveaway Picker", shareCanvas.width / 2, shareCanvas.height - 50);
+    
+    shareCanvas.toBlob((blob) => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `winner-${winnerName.trim().replace(/\s+/g, '-')}.png`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showMessage('Winner image downloaded', 'success');
+    });
+};
+
+copyWinnerBtn.onclick = () => {
+    const winnerText = winnerDisplay.textContent || winnerDisplay.innerText;
+    if (!winnerText || winnerText.includes('Spin the wheel')) {
+        showMessage('No winner to copy', 'error');
+        return;
+    }
+    
+    navigator.clipboard.writeText(winnerText).then(() => {
+        showMessage('Winner info copied to clipboard!', 'success');
+    }).catch(() => {
+        showMessage('Failed to copy winner info', 'error');
+    });
+};
+
+// ======================== Stats Management ========================
+function updateStats() {
+    document.getElementById('totalParticipants').textContent = wheelParticipants.length;
+    document.getElementById('totalEntries').textContent = wheelParticipants.length;
+    
+    const transaction = db.transaction("winners", "readonly");
+    const store = transaction.objectStore("winners");
+    store.getAll().onsuccess = (e) => {
+        document.getElementById('totalWinners').textContent = e.target.result.length;
+    };
+}
+
+// ======================== Input Validation ========================
 function setupInputValidation() {
     const inputs = document.querySelectorAll('input[type="text"], input[type="url"], input[type="number"]');
     
     inputs.forEach(input => {
         input.addEventListener('blur', function() {
             if (this.type === 'url' && this.value && !isValidUrl(this.value)) {
-                this.style.borderColor = '#ef4444';
+                this.classList.add('input-error');
                 showMessage('Please enter a valid URL', 'error');
             } else if (this.type === 'number' && this.value < this.min) {
-                this.style.borderColor = '#ef4444';
+                this.classList.add('input-error');
                 showMessage(`Value must be at least ${this.min}`, 'error');
             } else {
-                this.style.borderColor = '';
+                this.classList.remove('input-error');
             }
         });
         
         input.addEventListener('input', function() {
-            this.style.borderColor = '';
+            this.classList.remove('input-error');
         });
     });
 }
+
+// ======================== Keyboard Shortcuts ========================
+function setupKeyboardShortcuts() {
+    document.addEventListener('keydown', (e) => {
+        if (e.ctrlKey || e.metaKey) {
+            switch(e.key) {
+                case 'Enter':
+                    e.preventDefault();
+                    if (!spinning) spinBtn.click();
+                    break;
+                case 'n':
+                    e.preventDefault();
+                    participantName.focus();
+                    break;
+                case 's':
+                    e.preventDefault();
+                    document.getElementById('scheduledTime').focus();
+                    break;
+            }
+        }
+        
+        if (e.key === ' ' && document.activeElement === wheelCanvas) {
+            e.preventDefault();
+            if (!spinning) spinBtn.click();
+        }
+    });
+
+    [participantName, participantAvatar, participantEntriesInput].forEach(input => {
+        input.addEventListener("keyup", e => {
+            if (e.key === "Enter") addParticipantBtn.click();
+        });
+    });
+}
+
+// ======================== Responsive Wheel ========================
+function setupResponsiveWheel() {
+    function resizeWheel() {
+        const container = wheelCanvas.parentElement;
+        const size = Math.min(container.clientWidth - 40, 400);
+        wheelCanvas.width = size;
+        wheelCanvas.height = size;
+        scheduleWheelRedraw();
+    }
+    
+    resizeWheel();
+    window.addEventListener('resize', debounce(resizeWheel, 250));
+}
+
+// ======================== Auto-Save ========================
+function setupAutoSave() {
+    setInterval(() => {
+        if (wheelParticipants.length > 0) {
+            localStorage.setItem('giveawayLastState', JSON.stringify({
+                timestamp: new Date().toISOString(),
+                participantCount: wheelParticipants.length,
+                selectedChannel: selectedChannel
+            }));
+        }
+    }, 30000);
+    
+    const lastState = localStorage.getItem('giveawayLastState');
+    if (lastState) {
+        try {
+            const state = JSON.parse(lastState);
+            console.log('Last session:', state);
+        } catch (e) {
+            console.log('No previous state found');
+        }
+    }
+}
+
+// ======================== Accessibility ========================
+function setupAccessibility() {
+    let currentFocus = 0;
+    const focusableElements = Array.from(document.querySelectorAll(
+        'button, input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    ));
+    
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Tab') {
+            e.preventDefault();
+            currentFocus = (currentFocus + 1) % focusableElements.length;
+            focusableElements[currentFocus].focus();
+        }
+    });
+}
+
+// ======================== Initialize Application ========================
+document.addEventListener('DOMContentLoaded', () => {
+    initDB().then(() => {
+        showMessage('Giveaway Picker initialized successfully!', 'success');
+        announceToScreenReader('Giveaway Picker ready');
+        
+        setupAutoSave();
+        setupResponsiveWheel();
+        setupInputValidation();
+        setupAccessibility();
+        setupKeyboardShortcuts();
+        
+        segmentColorsInput.addEventListener('input', debounce(() => {
+            scheduleWheelRedraw();
+        }, 300));
+        
+        const floatingElements = document.querySelectorAll('.floating-element');
+        floatingElements.forEach((el, index) => {
+            el.style.animationDelay = `${index * 0.2}s`;
+        });
+    }).catch(error => {
+        showMessage('Failed to initialize application: ' + error.message, 'error');
+    });
+});
+
+// ======================== Responsive Adjustments ========================
+window.addEventListener('resize', debounce(() => {
+    scheduleWheelRedraw();
+}, 250));
+</script>
+</body>
+</html>

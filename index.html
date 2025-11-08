@@ -25,6 +25,7 @@
 body { 
     transition: all 0.3s ease; 
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
 }
 
 body.dark-mode {
@@ -83,6 +84,7 @@ body.dark-mode {
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
+    cursor: pointer;
 }
 
 .btn-premium::before {
@@ -250,6 +252,28 @@ body.dark-mode {
     border-radius: 10px;
     transition: width 0.5s ease;
 }
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .mobile-stack {
+        flex-direction: column;
+    }
+    .mobile-stack > * {
+        margin-bottom: 0.5rem;
+    }
+}
 </style>
 </head>
 <body class="min-h-screen py-8">
@@ -261,17 +285,20 @@ body.dark-mode {
         <p class="text-xl text-white opacity-90">The Ultimate Tool for Fair & Exciting Giveaways!</p>
     </div>
 
+    <!-- Messages Container -->
+    <div id="messagesContainer" class="mb-4"></div>
+
     <!-- Main Container -->
     <div class="container-glass p-6 mb-8">
         <!-- Navigation Tabs -->
         <div class="flex space-x-2 mb-6 bg-white/30 rounded-2xl p-2">
-            <button class="flex-1 py-3 px-4 text-center font-semibold rounded-xl transition-all tab-active">
+            <button class="flex-1 py-3 px-4 text-center font-semibold rounded-xl transition-all tab-active" data-tab="participants">
                 <i class="fas fa-users mr-2"></i>Participants
             </button>
-            <button class="flex-1 py-3 px-4 text-center font-semibold rounded-xl transition-all text-white/80 hover:text-white">
+            <button class="flex-1 py-3 px-4 text-center font-semibold rounded-xl transition-all text-white/80 hover:text-white" data-tab="winners">
                 <i class="fas fa-trophy mr-2"></i>Winners
             </button>
-            <button class="flex-1 py-3 px-4 text-center font-semibold rounded-xl transition-all text-white/80 hover:text-white">
+            <button class="flex-1 py-3 px-4 text-center font-semibold rounded-xl transition-all text-white/80 hover:text-white" data-tab="analytics">
                 <i class="fas fa-chart-bar mr-2"></i>Analytics
             </button>
         </div>
@@ -324,7 +351,7 @@ body.dark-mode {
                             <i class="fas fa-plus mr-2"></i>Add Channel
                         </button>
                         <select id="channelSelect" class="input-modern w-full">
-                            <option>Select a channel...</option>
+                            <option value="">Select a channel...</option>
                         </select>
                     </div>
                 </div>
@@ -337,7 +364,7 @@ body.dark-mode {
                     <div class="space-y-3">
                         <input id="participantName" type="text" class="input-modern w-full" placeholder="👤 Participant Name">
                         <input id="participantAvatar" type="url" class="input-modern w-full" placeholder="🖼️ Avatar URL (Optional)">
-                        <div class="flex space-x-3">
+                        <div class="flex space-x-3 mobile-stack">
                             <input id="participantEntries" type="number" class="input-modern flex-1" placeholder="🎟️ Entries" min="1" value="1">
                             <button id="addParticipantBtn" class="btn-premium">
                                 <i class="fas fa-plus mr-2"></i>Add
@@ -367,6 +394,14 @@ body.dark-mode {
                         <i class="fas fa-sync-alt mr-2"></i>Giveaway Wheel
                     </h2>
                     
+                    <!-- Segment Colors -->
+                    <div class="mb-4">
+                        <label class="font-semibold text-white">Segment Colors:</label>
+                        <input id="segmentColors" type="text" class="input-modern w-full mt-2" 
+                               placeholder="#FDE68A,#FBBF24,#C47E2C,#F59E0B" 
+                               value="#FDE68A,#FBBF24,#C47E2C,#F59E0B">
+                    </div>
+                    
                     <!-- Wheel Pointer -->
                     <div class="relative">
                         <div class="wheel-pointer absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-2 z-10">
@@ -377,7 +412,7 @@ body.dark-mode {
 
                     <!-- Spin Controls -->
                     <div class="mt-6 space-y-4">
-                        <div class="flex space-x-3 justify-center">
+                        <div class="flex space-x-3 justify-center mobile-stack">
                             <input id="winnersCount" type="number" class="input-modern w-32 text-center" placeholder="Winners" min="1" max="10" value="1">
                             <button id="spinBtn" class="btn-premium px-8">
                                 <i class="fas fa-play mr-2"></i>Spin Wheel
@@ -389,7 +424,7 @@ body.dark-mode {
                             <h3 class="text-white font-semibold mb-2">
                                 <i class="fas fa-clock mr-2"></i>Schedule Giveaway
                             </h3>
-                            <div class="flex space-x-2">
+                            <div class="flex space-x-2 mobile-stack">
                                 <input type="datetime-local" id="scheduledTime" class="input-modern flex-1">
                                 <button id="scheduleBtn" class="btn-premium bg-white/20 backdrop-blur-sm">
                                     <i class="fas fa-calendar-check mr-2"></i>Schedule
@@ -432,10 +467,8 @@ body.dark-mode {
                 <i class="fas fa-list mr-2"></i>Participants
                 <span id="participantCount" class="text-white/70 text-lg">(0)</span>
             </h2>
-            <div class="max-h-96 overflow-y-auto space-y-2">
-                <div id="participantsList">
-                    <!-- Participants will be dynamically added here -->
-                </div>
+            <div class="max-h-96 overflow-y-auto space-y-2" id="participantsList">
+                <!-- Participants will be dynamically added here -->
             </div>
         </div>
 
@@ -444,10 +477,8 @@ body.dark-mode {
             <h2 class="text-2xl font-bold gradient-text mb-4">
                 <i class="fas fa-trophy mr-2"></i>Winner History
             </h2>
-            <div class="max-h-96 overflow-y-auto space-y-2">
-                <div id="winnersList">
-                    <!-- Winners will be dynamically added here -->
-                </div>
+            <div class="max-h-96 overflow-y-auto space-y-2" id="winnersList">
+                <!-- Winners will be dynamically added here -->
             </div>
             <button id="clearHistory" class="btn-premium w-full mt-4" style="background: linear-gradient(135deg, #ef4444, #f97316);">
                 <i class="fas fa-broom mr-2"></i>Clear History
@@ -455,14 +486,27 @@ body.dark-mode {
         </div>
     </div>
 
+    <!-- Leaderboard Section (Hidden by default) -->
+    <div id="leaderboardSection" class="container-glass p-6 mb-8 hidden">
+        <h2 class="text-2xl font-bold gradient-text mb-4">
+            <i class="fas fa-chart-line mr-2"></i>Leaderboard
+        </h2>
+        <div class="max-h-96 overflow-y-auto space-y-2" id="leaderboardList">
+            <!-- Leaderboard will be dynamically added here -->
+        </div>
+    </div>
+
     <!-- Share Canvas (Hidden by default) -->
     <div class="text-center mb-8">
-        <canvas id="shareCanvas" width="600" height="400" class="border-2 border-dashed border-white/30 rounded-2xl hidden"></canvas>
+        <canvas id="shareCanvas" width="600" height="400" class="border-2 border-dashed border-white/30 rounded-2xl hidden mx-auto"></canvas>
     </div>
 </div>
 
 <!-- Confetti Canvas -->
 <canvas id="confettiCanvas" class="fixed top-0 left-0 w-full h-full pointer-events-none z-50"></canvas>
+
+<!-- Screen Reader Announcements -->
+<div id="liveAnnouncement" aria-live="polite" aria-atomic="true" class="sr-only"></div>
 
 <!-- Sounds -->
 <audio id="drumrollSound" preload="auto">
@@ -475,19 +519,458 @@ body.dark-mode {
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
 <script>
-// Enhanced wheel drawing with gradients
+// ======================== Utility Functions ========================
+function sanitizeInput(input) {
+    const div = document.createElement('div');
+    div.textContent = input;
+    return div.innerHTML;
+}
+
+function isValidUrl(string) {
+    try {
+        new URL(string);
+        return true;
+    } catch (_) {
+        return false;
+    }
+}
+
+function showMessage(message, type = 'info') {
+    const container = document.getElementById('messagesContainer');
+    const messageEl = document.createElement('div');
+    messageEl.className = type === 'error' ? 'bg-red-100 border border-red-300 text-red-700 px-4 py-3 rounded mb-4' : 
+                         type === 'success' ? 'bg-green-100 border border-green-300 text-green-700 px-4 py-3 rounded mb-4' : 
+                         'bg-blue-100 border border-blue-300 text-blue-700 px-4 py-3 rounded mb-4';
+    messageEl.textContent = message;
+    container.appendChild(messageEl);
+    
+    setTimeout(() => {
+        messageEl.remove();
+    }, 5000);
+}
+
+function announceToScreenReader(message) {
+    const announcement = document.getElementById('liveAnnouncement');
+    announcement.textContent = message;
+}
+
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+function darkenColor(color, percent) {
+    const num = parseInt(color.replace("#", ""), 16);
+    const amt = Math.round(2.55 * percent);
+    const R = Math.max(0, (num >> 16) - amt);
+    const G = Math.max(0, (num >> 8 & 0x00FF) - amt);
+    const B = Math.max(0, (num & 0x0000FF) - amt);
+    return "#" + (0x1000000 + R * 0x10000 + G * 0x100 + B).toString(16).slice(1);
+}
+
+// ======================== IndexedDB Setup ========================
+let db;
+let wheelRedrawPending = false;
+let wheelParticipants = [];
+let spinning = false;
+let selectedChannel = "";
+let scheduledTimeout = false;
+
+function initDB() {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open("GiveawayDB", 2);
+        
+        request.onerror = () => {
+            showMessage('Failed to open database', 'error');
+            reject(request.error);
+        };
+        
+        request.onupgradeneeded = (e) => {
+            db = e.target.result;
+            try {
+                if (!db.objectStoreNames.contains("participants")) {
+                    db.createObjectStore("participants", { keyPath: "id", autoIncrement: true })
+                      .createIndex("channelLink", "channelLink", { unique: false });
+                }
+                if (!db.objectStoreNames.contains("winners")) {
+                    db.createObjectStore("winners", { keyPath: "id", autoIncrement: true });
+                }
+                if (!db.objectStoreNames.contains("channels")) {
+                    db.createObjectStore("channels", { keyPath: "link" });
+                }
+            } catch (error) {
+                showMessage('Database upgrade failed: ' + error.message, 'error');
+            }
+        };
+        
+        request.onsuccess = (e) => {
+            db = e.target.result;
+            loadChannels();
+            loadParticipants();
+            loadWinners();
+            updateStats();
+            resolve(db);
+        };
+    });
+}
+
+function handleDBError(error, operation) {
+    console.error(`Database ${operation} error:`, error);
+    showMessage(`Database error during ${operation}: ${error.message}`, 'error');
+}
+
+// ======================== DOM Elements ========================
+const addChannelBtn = document.getElementById("addChannelBtn");
+const channelLinkInput = document.getElementById("channelLink");
+const channelSelect = document.getElementById("channelSelect");
+const addParticipantBtn = document.getElementById("addParticipantBtn");
+const participantName = document.getElementById("participantName");
+const participantAvatar = document.getElementById("participantAvatar");
+const participantEntriesInput = document.getElementById("participantEntries");
+const participantsList = document.getElementById("participantsList");
+const participantCount = document.getElementById("participantCount");
+const spinBtn = document.getElementById("spinBtn");
+const winnersCountInput = document.getElementById("winnersCount");
+const winnerDisplay = document.getElementById("winnerDisplay");
+const winnersList = document.getElementById("winnersList");
+const clearHistoryBtn = document.getElementById("clearHistory");
+const csvUpload = document.getElementById("csvUpload");
+const drumrollSound = document.getElementById("drumrollSound");
+const cheerSound = document.getElementById("cheerSound");
+const wheelCanvas = document.getElementById("wheelCanvas");
+const wheelCtx = wheelCanvas.getContext("2d");
+const shareCanvas = document.getElementById("shareCanvas");
+const shareCtx = shareCanvas.getContext("2d");
+const generateImageBtn = document.getElementById("generateImageBtn");
+const copyWinnerBtn = document.getElementById("copyWinnerBtn");
+const themeToggle = document.getElementById("themeToggle");
+const scheduleBtn = document.getElementById("scheduleBtn");
+const countdownElem = document.getElementById("countdown");
+const bulkDeleteBtn = document.getElementById("bulkDeleteBtn");
+const showLeaderboardBtn = document.getElementById("showLeaderboard");
+const exportStatsBtn = document.getElementById("exportStats");
+const leaderboardSection = document.getElementById("leaderboardSection");
+const leaderboardList = document.getElementById("leaderboardList");
+
+// ======================== Theme Toggle ========================
+themeToggle.onclick = () => {
+    document.body.classList.toggle("dark-mode");
+    const isDark = document.body.classList.contains("dark-mode");
+    showMessage(`${isDark ? 'Dark' : 'Light'} mode activated`, 'success');
+    drawWheel(); // Redraw wheel with correct colors
+};
+
+// ======================== Tab Navigation ========================
+document.querySelectorAll('[data-tab]').forEach(tab => {
+    tab.addEventListener('click', function() {
+        // Remove active class from all tabs
+        document.querySelectorAll('[data-tab]').forEach(t => {
+            t.classList.remove('tab-active', 'text-white');
+            t.classList.add('text-white/80');
+        });
+        
+        // Add active class to clicked tab
+        this.classList.add('tab-active', 'text-white');
+        this.classList.remove('text-white/80');
+        
+        // Handle tab content
+        const tabName = this.getAttribute('data-tab');
+        if (tabName === 'winners') {
+            loadWinners();
+        } else if (tabName === 'analytics') {
+            showLeaderboard();
+            leaderboardSection.classList.remove('hidden');
+        } else {
+            leaderboardSection.classList.add('hidden');
+        }
+    });
+});
+
+// ======================== Channel Management ========================
+addChannelBtn.onclick = () => {
+    const link = channelLinkInput.value.trim();
+    if (!link) {
+        showMessage('Please enter a channel link', 'error');
+        return;
+    }
+    
+    if (!isValidUrl(link)) {
+        showMessage('Please enter a valid URL', 'error');
+        return;
+    }
+    
+    const transaction = db.transaction("channels", "readwrite");
+    const store = transaction.objectStore("channels");
+    
+    transaction.onerror = () => handleDBError(transaction.error, 'add channel');
+    transaction.oncomplete = () => {
+        channelLinkInput.value = "";
+        loadChannels();
+        showMessage('Channel added successfully', 'success');
+    };
+    
+    store.put({ link: sanitizeInput(link) });
+};
+
+channelSelect.onchange = () => { 
+    selectedChannel = channelSelect.value; 
+    loadParticipants(); 
+    showMessage(`Switched to channel: ${selectedChannel}`, 'success');
+};
+
+function loadChannels() {
+    channelSelect.innerHTML = '<option value="">Select a channel...</option>';
+    const transaction = db.transaction("channels", "readonly");
+    const store = transaction.objectStore("channels");
+    
+    store.getAll().onsuccess = (e) => {
+        const channels = e.target.result;
+        channels.forEach(c => {
+            const option = document.createElement("option"); 
+            option.value = c.link; 
+            option.textContent = c.link; 
+            channelSelect.appendChild(option);
+        });
+        
+        if (channels.length > 0 && !selectedChannel) {
+            selectedChannel = channelSelect.value;
+            loadParticipants();
+        }
+    };
+}
+
+// ======================== Participant Management ========================
+function isDuplicateParticipant(name) {
+    return wheelParticipants.some(p => 
+        p.name.toLowerCase() === name.toLowerCase()
+    );
+}
+
+addParticipantBtn.onclick = () => {
+    const name = sanitizeInput(participantName.value.trim());
+    const avatar = participantAvatar.value.trim();
+    const entries = parseInt(participantEntriesInput.value) || 1;
+    
+    if (!name) {
+        showMessage('Please enter a participant name', 'error');
+        return;
+    }
+    
+    if (!selectedChannel) {
+        showMessage('Please select a channel first', 'error');
+        return;
+    }
+    
+    if (avatar && !isValidUrl(avatar)) {
+        showMessage('Please enter a valid avatar URL', 'error');
+        return;
+    }
+    
+    if (isDuplicateParticipant(name)) {
+        showMessage('Participant already exists', 'error');
+        return;
+    }
+    
+    const transaction = db.transaction("participants", "readwrite");
+    const store = transaction.objectStore("participants");
+    
+    transaction.onerror = () => handleDBError(transaction.error, 'add participant');
+    transaction.oncomplete = () => {
+        participantName.value = ""; 
+        participantAvatar.value = ""; 
+        participantEntriesInput.value = 1;
+        loadParticipants();
+        showMessage(`Added participant: ${name}`, 'success');
+    };
+    
+    store.add({
+        name, 
+        avatarURL: avatar, 
+        channelLink: selectedChannel, 
+        entries
+    });
+};
+
+bulkDeleteBtn.onclick = () => {
+    if (!selectedChannel) {
+        showMessage('Please select a channel first', 'error');
+        return;
+    }
+    
+    if (!confirm('Are you sure you want to delete ALL participants for this channel?')) {
+        return;
+    }
+    
+    const transaction = db.transaction("participants", "readwrite");
+    const store = transaction.objectStore("participants");
+    const index = store.index("channelLink");
+    
+    const request = index.getAll(selectedChannel);
+    request.onsuccess = () => {
+        const participants = request.result;
+        const deleteTransaction = db.transaction("participants", "readwrite");
+        const deleteStore = deleteTransaction.objectStore("participants");
+        
+        participants.forEach(participant => {
+            deleteStore.delete(participant.id);
+        });
+        
+        deleteTransaction.oncomplete = () => {
+            loadParticipants();
+            showMessage('All participants deleted', 'success');
+        };
+        
+        deleteTransaction.onerror = () => handleDBError(deleteTransaction.error, 'delete participants');
+    };
+};
+
+csvUpload.addEventListener("change", function() {
+    const file = csvUpload.files[0]; 
+    if (!file || !selectedChannel) {
+        showMessage('Please select a file and channel first', 'error');
+        return;
+    }
+    
+    document.getElementById("loadingIndicator").classList.remove("hidden");
+    const reader = new FileReader();
+    
+    reader.onload = (e) => {
+        const lines = e.target.result.split("\n");
+        let added = 0, duplicates = 0, errors = 0;
+        
+        const transaction = db.transaction("participants", "readwrite");
+        const store = transaction.objectStore("participants");
+        
+        transaction.onerror = () => handleDBError(transaction.error, 'CSV import');
+        
+        lines.forEach((line, index) => {
+            if (!line.trim()) return;
+            
+            const [name, avatar, entries] = line.split(",");
+            const sanitizedName = sanitizeInput(name.trim());
+            
+            if (!sanitizedName) {
+                errors++;
+                return;
+            }
+            
+            if (isDuplicateParticipant(sanitizedName)) {
+                duplicates++;
+                return;
+            }
+            
+            store.add({
+                name: sanitizedName,
+                avatarURL: (avatar || "").trim(),
+                channelLink: selectedChannel,
+                entries: parseInt(entries) || 1
+            });
+            added++;
+        });
+        
+        transaction.oncomplete = () => {
+            setTimeout(() => {
+                loadParticipants();
+                document.getElementById("loadingIndicator").classList.add("hidden");
+                csvUpload.value = '';
+                showMessage(`CSV import complete: ${added} added, ${duplicates} duplicates skipped, ${errors} errors`, 'success');
+            }, 200);
+        };
+    };
+    
+    reader.onerror = () => {
+        document.getElementById("loadingIndicator").classList.add("hidden");
+        showMessage('Error reading file', 'error');
+    };
+    
+    reader.readAsText(file);
+});
+
+function loadParticipants() {
+    participantsList.innerHTML = ""; 
+    wheelParticipants = [];
+    
+    if (!selectedChannel) {
+        participantCount.textContent = '(0)';
+        updateStats();
+        drawWheel();
+        return;
+    }
+    
+    const transaction = db.transaction("participants", "readonly");
+    const store = transaction.objectStore("participants");
+    const index = store.index("channelLink");
+    
+    index.getAll(selectedChannel).onsuccess = (e) => {
+        const participants = e.target.result;
+        participantCount.textContent = `(${participants.length})`;
+        
+        if (participants.length === 0) {
+            participantsList.innerHTML = `
+                <div class="text-center py-8 text-white/70">
+                    <i class="fas fa-users text-4xl mb-4"></i>
+                    <p>No participants yet</p>
+                    <p class="text-sm">Add participants to get started</p>
+                </div>
+            `;
+        } else {
+            participants.forEach(p => {
+                const participantEl = document.createElement("div");
+                participantEl.className = "participant-item";
+                participantEl.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center text-white font-bold">
+                            ${p.name.charAt(0).toUpperCase()}
+                        </div>
+                        <div>
+                            <div class="font-semibold">${p.name}</div>
+                            <div class="text-sm text-gray-500">${p.entries} entries</div>
+                        </div>
+                    </div>
+                `;
+                participantsList.appendChild(participantEl);
+                
+                for (let i = 0; i < p.entries; i++) {
+                    wheelParticipants.push(p);
+                }
+            });
+        }
+        
+        updateStats();
+        scheduleWheelRedraw();
+    };
+}
+
+// ======================== Wheel Drawing ========================
+function scheduleWheelRedraw() {
+    if (!wheelRedrawPending) {
+        wheelRedrawPending = true;
+        requestAnimationFrame(() => {
+            drawWheel();
+            wheelRedrawPending = false;
+        });
+    }
+}
+
 function drawWheel() {
     const ctx = wheelCtx, size = wheelCanvas.width, radius = size / 2;
     ctx.clearRect(0, 0, size, size);
     const count = wheelParticipants.length; 
     if (count === 0) {
         // Draw empty state
-        ctx.fillStyle = '#F3F4F6';
+        ctx.fillStyle = document.body.classList.contains("dark-mode") ? '#374151' : '#F3F4F6';
         ctx.beginPath();
         ctx.arc(radius, radius, radius, 0, 2 * Math.PI);
         ctx.fill();
         
-        ctx.fillStyle = '#9CA3AF';
+        ctx.fillStyle = document.body.classList.contains("dark-mode") ? '#9CA3AF' : '#6B7280';
         ctx.font = '16px Poppins';
         ctx.textAlign = 'center';
         ctx.fillText('Add participants to begin', radius, radius);
@@ -503,11 +986,9 @@ function drawWheel() {
         const endAngle = (i + 1) * angle;
         
         // Create gradient for segment
-        const gradient = ctx.createLinearGradient(
-            radius + Math.cos(startAngle) * radius,
-            radius + Math.sin(startAngle) * radius,
-            radius + Math.cos(endAngle) * radius,
-            radius + Math.sin(endAngle) * radius
+        const gradient = ctx.createRadialGradient(
+            radius, radius, 0,
+            radius, radius, radius
         );
         
         gradient.addColorStop(0, colors[i % colors.length]);
@@ -543,102 +1024,96 @@ function drawWheel() {
     ctx.arc(radius, radius, 20, 0, 2 * Math.PI);
     ctx.fillStyle = '#FFFFFF';
     ctx.fill();
-    ctx.strokeStyle = var(--primary);
+    ctx.strokeStyle = '#C47E2C';
     ctx.lineWidth = 3;
     ctx.stroke();
 }
 
-function darkenColor(color, percent) {
-    const num = parseInt(color.replace("#", ""), 16);
-    const amt = Math.round(2.55 * percent);
-    const R = (num >> 16) - amt;
-    const G = (num >> 8 & 0x00FF) - amt;
-    const B = (num & 0x0000FF) - amt;
-    return "#" + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
-            (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 +
-            (B < 255 ? B < 1 ? 0 : B : 255)).toString(16).slice(1);
-}
-
-// Enhanced participant list rendering
-function loadParticipants() {
-    const participantsList = document.getElementById("participantsList");
-    participantsList.innerHTML = ""; 
-    wheelParticipants = [];
+// ======================== Spin Logic ========================
+const debouncedSpin = debounce(() => {
+    if (spinning || wheelParticipants.length === 0) return;
     
-    if (!selectedChannel) {
-        participantCount.textContent = '(0)';
-        updateStats();
-        drawWheel();
-        return;
+    spinning = true;
+    spinBtn.disabled = true;
+    spinBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Spinning...';
+    
+    drumrollSound.play().catch(e => console.log('Audio play failed:', e));
+    
+    const winnersCount = Math.min(parseInt(winnersCountInput.value) || 1, 10);
+    let tempParticipants = [...wheelParticipants];
+    let winners = [];
+    
+    function pickWinner() {
+        return new Promise(resolve => {
+            const start = 0;
+            const target = Math.random() * 2 * Math.PI + 6 * Math.PI;
+            const duration = 3000;
+            const startTime = performance.now();
+            
+            function animate(now) {
+                let t = (now - startTime) / duration;
+                if (t > 1) t = 1;
+                const eased = 1 - Math.pow(1 - t, 3);
+                wheelCanvas.style.transform = `rotate(${eased * target}rad)`;
+                
+                if (t < 1) {
+                    requestAnimationFrame(animate);
+                } else {
+                    const winnerIndex = Math.floor(Math.random() * tempParticipants.length);
+                    const winner = tempParticipants[winnerIndex];
+                    winners.push(winner);
+                    
+                    announceWinner(winner);
+                    winnerDisplay.classList.add("glow");
+                    
+                    announceToScreenReader(`Winner selected: ${winner.name}`);
+                    
+                    setTimeout(() => winnerDisplay.classList.remove("glow"), 2000);
+                    tempParticipants = tempParticipants.filter(p => p.name !== winner.name);
+                    
+                    confetti({ particleCount: 150, spread: 60, origin: { y: 0.6 } });
+                    cheerSound.play().catch(e => console.log('Audio play failed:', e));
+                    
+                    const transaction = db.transaction("winners", "readwrite");
+                    const store = transaction.objectStore("winners");
+                    store.add({
+                        ...winner,
+                        date: new Date()
+                    });
+                    
+                    transaction.oncomplete = () => {
+                        loadWinners();
+                        updateStats();
+                    };
+                    
+                    setTimeout(resolve, 1500);
+                }
+            }
+            requestAnimationFrame(animate);
+        });
     }
     
-    const transaction = db.transaction("participants", "readonly");
-    const store = transaction.objectStore("participants");
-    const index = store.index("channelLink");
-    
-    index.getAll(selectedChannel).onsuccess = (e) => {
-        const participants = e.target.result;
-        participantCount.textContent = `(${participants.length})`;
-        
-        if (participants.length === 0) {
-            participantsList.innerHTML = `
-                <div class="text-center py-8 text-white/70">
-                    <i class="fas fa-users text-4xl mb-4"></i>
-                    <p>No participants yet</p>
-                    <p class="text-sm">Add participants to get started</p>
-                </div>
-            `;
-        } else {
-            participants.forEach(p => {
-                const participantEl = document.createElement("div");
-                participantEl.className = "participant-item";
-                participantEl.innerHTML = `
-                    <div class="flex items-center space-x-3">
-                        <div class="w-10 h-10 bg-gradient-to-r from-${getRandomColor()} to-${getRandomColor()} rounded-full flex items-center justify-center text-white font-bold">
-                            ${p.name.charAt(0).toUpperCase()}
-                        </div>
-                        <div>
-                            <div class="font-semibold">${p.name}</div>
-                            <div class="text-sm text-gray-500">${p.entries} entries</div>
-                        </div>
-                    </div>
-                    <div class="winner-badge hidden">
-                        <i class="fas fa-trophy mr-1"></i>Winner
-                    </div>
-                `;
-                participantsList.appendChild(participantEl);
-                
-                for (let i = 0; i < p.entries; i++) {
-                    wheelParticipants.push(p);
-                }
-            });
+    async function pickAllWinners() {
+        for (let n = 0; n < winnersCount; n++) {
+            if (tempParticipants.length === 0) break;
+            await pickWinner();
         }
         
-        updateStats();
-        scheduleWheelRedraw();
-    };
-}
-
-function getRandomColor() {
-    const colors = ['yellow-400', 'green-400', 'blue-400', 'purple-400', 'pink-400', 'red-400'];
-    return colors[Math.floor(Math.random() * colors.length)];
-}
-
-function updateStats() {
-    document.getElementById('totalParticipants').textContent = wheelParticipants.length;
-    document.getElementById('totalEntries').textContent = wheelParticipants.length;
+        spinning = false;
+        spinBtn.disabled = false;
+        spinBtn.innerHTML = '<i class="fas fa-play mr-2"></i>Spin Wheel';
+        
+        if (winners.length > 1) {
+            showMessage(`Selected ${winners.length} winners!`, 'success');
+        }
+    }
     
-    // Update winners count
-    const transaction = db.transaction("winners", "readonly");
-    const store = transaction.objectStore("winners");
-    store.getAll().onsuccess = (e) => {
-        document.getElementById('totalWinners').textContent = e.target.result.length;
-    };
-}
+    pickAllWinners();
+}, 1000);
 
-// Enhanced winner announcement
+spinBtn.onclick = debouncedSpin;
+
 function announceWinner(winner) {
-    const winnerDisplay = document.getElementById('winnerDisplay');
     winnerDisplay.innerHTML = `
         <div class="text-center">
             <div class="floating-element mb-4">
@@ -646,7 +1121,7 @@ function announceWinner(winner) {
             </div>
             <div class="text-3xl font-bold mb-2">Congratulations!</div>
             <div class="text-4xl font-bold gradient-text">${winner.name}</div>
-            <div class="text-lg text-white/70 mt-2">You are the giveaway winner! 🎉</div>
+            <div class="text-lg text-gray-600 mt-2">You are the giveaway winner! 🎉</div>
         </div>
     `;
     
@@ -662,19 +1137,273 @@ function announceWinner(winner) {
     setTimeout(() => confetti({ particleCount: 100, spread: 70, origin: { x: 0.8, y: 0.6 } }), 600);
 }
 
-// Initialize enhanced UI
-document.addEventListener('DOMContentLoaded', function() {
-    // Add floating animation to various elements
-    const floatingElements = document.querySelectorAll('.floating-element');
-    floatingElements.forEach((el, index) => {
-        el.style.animationDelay = `${index * 0.2}s`;
-    });
+// ======================== Winner Management ========================
+function loadWinners() {
+    winnersList.innerHTML = "";
+    const transaction = db.transaction("winners", "readonly");
+    const store = transaction.objectStore("winners");
     
-    // Initialize stats
-    updateStats();
+    store.getAll().onsuccess = (e) => {
+        const winners = e.target.result.slice(-10).reverse(); // Show last 10 winners
+        
+        if (winners.length === 0) {
+            winnersList.innerHTML = `
+                <div class="text-center py-8 text-white/70">
+                    <i class="fas fa-trophy text-4xl mb-4"></i>
+                    <p>No winners yet</p>
+                    <p class="text-sm">Spin the wheel to select winners</p>
+                </div>
+            `;
+            return;
+        }
+        
+        winners.forEach(w => {
+            const winnerEl = document.createElement("div");
+            winnerEl.className = "participant-item";
+            winnerEl.innerHTML = `
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full flex items-center justify-center text-white font-bold">
+                        ${w.name.charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                        <div class="font-semibold">${w.name}</div>
+                        <div class="text-sm text-gray-500">${new Date(w.date).toLocaleString()}</div>
+                    </div>
+                </div>
+                <div class="winner-badge">
+                    <i class="fas fa-trophy mr-1"></i>Winner
+                </div>
+            `;
+            winnersList.appendChild(winnerEl);
+        });
+    });
+}
+
+clearHistoryBtn.onclick = () => {
+    if (confirm('Are you sure you want to clear all winner history?')) {
+        const transaction = db.transaction("winners", "readwrite");
+        const store = transaction.objectStore("winners");
+        store.clear().onsuccess = () => {
+            loadWinners();
+            updateStats();
+            showMessage('Winner history cleared', 'success');
+        };
+    }
+};
+
+// ======================== Scheduled Giveaway ========================
+scheduleBtn.onclick = () => {
+    const scheduledInput = document.getElementById("scheduledTime").value;
+    if (!scheduledInput) {
+        showMessage('Please select date & time!', 'error');
+        return;
+    }
+    
+    const scheduledDate = new Date(scheduledInput);
+    const now = new Date();
+    const delay = scheduledDate - now;
+    
+    if (delay <= 0) {
+        showMessage('Time must be in future!', 'error');
+        return;
+    }
+    
+    clearTimeout(scheduledTimeout);
+    
+    function updateCountdown() {
+        const diff = scheduledDate - new Date();
+        if (diff <= 0) {
+            countdownElem.textContent = "🎯 Giveaway Live! Spinning now...";
+            announceToScreenReader('Scheduled giveaway starting now');
+            spinBtn.click();
+        } else {
+            const h = Math.floor(diff / (1000 * 60 * 60));
+            const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const s = Math.floor((diff % (1000 * 60)) / 1000);
+            countdownElem.textContent = `Starts in: ${h}h ${m}m ${s}s`;
+            scheduledTimeout = setTimeout(updateCountdown, 1000);
+        }
+    }
+    
+    updateCountdown();
+    showMessage(`Giveaway scheduled for ${scheduledDate.toLocaleString()}`, 'success');
+};
+
+// ======================== Leaderboard & Analytics ========================
+function showLeaderboard() {
+    leaderboardList.innerHTML = "";
+    const transaction = db.transaction("winners", "readonly");
+    const store = transaction.objectStore("winners");
+    
+    store.getAll().onsuccess = (e) => {
+        const tally = {};
+        e.target.result.forEach(w => {
+            tally[w.name] = (tally[w.name] || 0) + 1;
+        });
+        
+        const sorted = Object.entries(tally).sort((a, b) => b[1] - a[1]);
+        if (sorted.length === 0) {
+            leaderboardList.innerHTML = `
+                <div class="text-center py-8 text-white/70">
+                    <i class="fas fa-chart-line text-4xl mb-4"></i>
+                    <p>No leaderboard data yet</p>
+                    <p class="text-sm">Select some winners first</p>
+                </div>
+            `;
+            return;
+        }
+        
+        sorted.forEach(([name, wins], index) => {
+            const leaderEl = document.createElement("div");
+            leaderEl.className = "participant-item";
+            leaderEl.innerHTML = `
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-r from-purple-400 to-pink-500 rounded-full flex items-center justify-center text-white font-bold">
+                        ${index + 1}
+                    </div>
+                    <div>
+                        <div class="font-semibold">${name}</div>
+                        <div class="text-sm text-gray-500">${wins} win${wins > 1 ? 's' : ''}</div>
+                    </div>
+                </div>
+                <div class="text-2xl font-bold text-yellow-400">
+                    ${index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '🏆'}
+                </div>
+            `;
+            leaderboardList.appendChild(leaderEl);
+        });
+    };
+}
+
+showLeaderboardBtn.onclick = () => {
+    showLeaderboard();
+    leaderboardSection.classList.remove('hidden');
+};
+
+exportStatsBtn.onclick = () => {
+    const transaction = db.transaction("winners", "readonly");
+    const store = transaction.objectStore("winners");
+    
+    store.getAll().onsuccess = (e) => {
+        const tally = {};
+        e.target.result.forEach(w => {
+            tally[w.name] = (tally[w.name] || 0) + 1;
+        });
+        
+        let csv = "Name,Wins\n";
+        Object.entries(tally).forEach(([name, wins]) => {
+            csv += `${name},${wins}\n`;
+        });
+        
+        const blob = new Blob([csv], { type: "text/csv" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "giveaway_leaderboard.csv";
+        a.click();
+        showMessage('Leaderboard exported as CSV', 'success');
+    };
+};
+
+// ======================== Share Features ========================
+generateImageBtn.onclick = () => {
+    const winnerText = winnerDisplay.textContent || winnerDisplay.innerText;
+    if (!winnerText || winnerText.includes('Spin the wheel')) {
+        showMessage('No winner to generate image for', 'error');
+        return;
+    }
+    
+    shareCanvas.classList.remove('hidden');
+    shareCtx.clearRect(0, 0, shareCanvas.width, shareCanvas.height);
+    
+    // Background
+    shareCtx.fillStyle = document.body.classList.contains("dark-mode") ? "#374151" : "#fff8f0";
+    shareCtx.fillRect(0, 0, shareCanvas.width, shareCanvas.height);
+    
+    // Title
+    shareCtx.fillStyle = "#C47E2C";
+    shareCtx.font = "bold 40px Poppins";
+    shareCtx.textAlign = "center";
+    shareCtx.fillText("🎉 Giveaway Winner 🎉", shareCanvas.width / 2, 80);
+    
+    // Winner Name
+    shareCtx.fillStyle = "#10B981";
+    shareCtx.font = "bold 50px Poppins";
+    const winnerName = winnerText.replace("🎉 Winner: ", "").replace(" 🎉", "").split('Congratulations!')[1] || winnerText;
+    shareCtx.fillText(winnerName.trim(), shareCanvas.width / 2, shareCanvas.height / 2);
+    
+    // Footer
+    shareCtx.fillStyle = "#6B7280";
+    shareCtx.font = "20px Poppins";
+    shareCtx.fillText("Selected via Adler's Giveaway Picker", shareCanvas.width / 2, shareCanvas.height - 50);
+    
+    // Create download link
+    shareCanvas.toBlob((blob) => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `winner-${winnerName.trim().replace(/\s+/g, '-')}.png`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showMessage('Winner image downloaded', 'success');
+    });
+};
+
+copyWinnerBtn.onclick = () => {
+    const winnerText = winnerDisplay.textContent || winnerDisplay.innerText;
+    if (!winnerText || winnerText.includes('Spin the wheel')) {
+        showMessage('No winner to copy', 'error');
+        return;
+    }
+    
+    navigator.clipboard.writeText(winnerText).then(() => {
+        showMessage('Winner info copied to clipboard!', 'success');
+    }).catch(() => {
+        showMessage('Failed to copy winner info', 'error');
+    });
+};
+
+// ======================== Stats Management ========================
+function updateStats() {
+    document.getElementById('totalParticipants').textContent = wheelParticipants.length;
+    document.getElementById('totalEntries').textContent = wheelParticipants.length;
+    
+    // Update winners count
+    const transaction = db.transaction("winners", "readonly");
+    const store = transaction.objectStore("winners");
+    store.getAll().onsuccess = (e) => {
+        document.getElementById('totalWinners').textContent = e.target.result.length;
+    };
+}
+
+// ======================== Keyboard Shortcuts ========================
+[participantName, participantAvatar, participantEntriesInput].forEach(input => {
+    input.addEventListener("keyup", e => {
+        if (e.key === "Enter") addParticipantBtn.click();
+    });
 });
 
-// ... (rest of your existing JavaScript with the enhanced functions integrated)
+// ======================== Initialize Application ========================
+document.addEventListener('DOMContentLoaded', () => {
+    initDB().then(() => {
+        showMessage('Giveaway Picker initialized successfully!', 'success');
+        announceToScreenReader('Giveaway Picker ready');
+        
+        // Add floating animation to various elements
+        const floatingElements = document.querySelectorAll('.floating-element');
+        floatingElements.forEach((el, index) => {
+            el.style.animationDelay = `${index * 0.2}s`;
+        });
+    }).catch(error => {
+        showMessage('Failed to initialize application: ' + error.message, 'error');
+    });
+});
+
+// ======================== Responsive Adjustments ========================
+window.addEventListener('resize', debounce(() => {
+    scheduleWheelRedraw();
+}, 250));
 </script>
 </body>
 </html>

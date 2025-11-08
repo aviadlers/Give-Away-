@@ -1,57 +1,323 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Adlers TV Fundraiser</title>
-  <link rel="stylesheet" href="style.css" />
-  <script defer src="script.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Adlers Giveaway Picker</title>
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+<style>
+body { transition: background-color 0.3s, color 0.3s; }
+#wheelCanvas { border:5px solid #C47E2C; border-radius:50%; margin:20px auto; display:block; background:#fff8f0; transition: transform 0.5s ease-out; }
+#winnerDisplay { transition: all 0.5s ease; }
+#winnerDisplay.glow { color:#16a34a; text-shadow:0 0 10px #16a34a,0 0 20px #16a34a,0 0 30px #fcd34d; transform: scale(1.2); }
+button { transition: transform 0.2s, background-color 0.2s; }
+button:hover { transform: scale(1.05); }
+#participantsList li { transition: background-color 0.2s; }
+#participantsList li:hover { background-color: #fde68a; }
+.dark-mode { background-color:#1F2937 !important; color:#F3F4F6 !important; }
+.dark-mode input, .dark-mode select, .dark-mode button, .dark-mode ul { background-color:#374151 !important; color:#F3F4F6 !important; border-color:#4B5563 !important; }
+</style>
 </head>
-<body>
-  <header>
-    <h1>Adlers TV Fundraiser</h1>
-    <div class="subtitle">
-      <span class="animated-text"></span>
-    </div>
-  </header>
+<body class="bg-gray-100 text-gray-800 font-sans relative">
 
-  <section class="donation-section">
-    <h2>Support via Airtel</h2>
-    <img src="images/airtel_qr.jpeg" alt="Airtel QR Code" class="qr"/>
-    <p>Account Number: <strong>0966 000 000</strong></p>
-  </section>
+<div class="max-w-5xl mx-auto p-4">
+<h1 class="text-3xl font-bold mb-4 text-center text-yellow-700">🎉 Adlers Giveaway Picker</h1>
 
-  <section class="social-section">
-    <h2>Follow & Connect</h2>
-    <div class="social-icons">
-      <a href="https://facebook.com/share/1CZpWNJVc9/?mibextid=wwXIfr" target="_blank">Facebook</a>
-      <a href="https://instagram.com/adlers_tv_" target="_blank">Instagram</a>
-      <a href="https://www.tiktok.com/@adlertv.com" target="_blank">TikTok</a>
-      <a href="https://whatsapp.com/channel/0029VbBTNd577qVX6QBD7E1W" target="_blank">WhatsApp</a>
-      <a href="https://youtube.com/@adlers_tv" target="_blank">YouTube</a>
-    </div>
-  </section>
+<!-- Theme Toggle -->
+<div class="flex justify-end mb-4">
+<button id="themeToggle" class="bg-gray-700 text-white px-4 py-1 rounded">Toggle Dark Mode</button>
+</div>
 
-  <section class="slideshow">
-    <h2>Gallery</h2>
-    <div class="slideshow-container">
-      <!-- Slideshow images injected via JS -->
-    </div>
-  </section>
+<!-- Channel Input -->
+<div class="mb-4 flex gap-2">
+<input id="channelLink" type="url" class="border p-2 flex-1 rounded" placeholder="Add video/channel link">
+<button id="addChannelBtn" class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 rounded">Add Channel</button>
+</div>
 
-  <section class="mission">
-    <h2>Our Mission</h2>
-    <p>To create, educate, and inspire through meaningful media content that uplifts communities, nurtures talent, and tells stories that matter.</p>
-  </section>
+<!-- Channel Selector -->
+<div class="mb-4">
+<label class="font-semibold">Select Channel/Video:</label>
+<select id="channelSelect" class="border p-2 rounded w-full"></select>
+</div>
 
-  <section class="vision">
-    <h2>Our Vision</h2>
-    <p>To become a leading voice of creativity, impact, and growth in Zambia and beyond — empowering the next generation of storytellers.</p>
-  </section>
+<!-- Segment Colors -->
+<div class="mb-4 flex gap-2">
+<label>Segment Colors (comma separated hex):</label>
+<input id="segmentColors" type="text" class="border p-2 flex-1 rounded" placeholder="#FDE68A,#FBBF24">
+</div>
 
-  <footer>
-    <p>&copy; 2025 Adlers TV Fundraiser. All rights reserved.</p>
-  </footer>
+<!-- Participant Entry -->
+<div class="mb-4 flex gap-2">
+<input id="participantName" type="text" class="border p-2 flex-1 rounded" placeholder="Participant name">
+<input id="participantAvatar" type="url" class="border p-2 flex-1 rounded" placeholder="Avatar URL (optional)">
+<input id="participantEntries" type="number" class="border p-2 w-24 rounded" placeholder="Entries" min="1" value="1">
+<button id="addParticipantBtn" class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 rounded">Add Participant</button>
+</div>
+
+<!-- CSV Upload -->
+<div class="mb-2">
+<label class="font-semibold">Upload CSV (name,avatarURL,entries):</label>
+<input id="csvUpload" type="file" accept=".csv" class="border p-2 rounded w-full">
+<div id="loadingIndicator" class="hidden mb-2 text-center text-blue-600 font-bold">Loading...</div>
+</div>
+
+<!-- Participants List -->
+<div class="mb-4">
+<h2 class="font-bold mb-2">Participants:</h2>
+<ul id="participantsList" class="list-disc list-inside max-h-48 overflow-y-auto border p-2 rounded bg-white"></ul>
+</div>
+
+<!-- Scheduled Giveaway -->
+<div class="mb-4 text-center">
+<label class="font-semibold mr-2">Schedule Giveaway:</label>
+<input type="datetime-local" id="scheduledTime" class="border p-2 rounded">
+<button id="scheduleBtn" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-1 rounded">Schedule</button>
+<div id="countdown" class="mt-2 font-bold text-red-600"></div>
+</div>
+
+<!-- Spinning Wheel -->
+<canvas id="wheelCanvas" width="400" height="400"></canvas>
+<div class="text-center mb-4 flex gap-2 justify-center">
+<button id="spinBtn" class="bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-2 rounded text-lg">🎯 Pick Winner</button>
+<input type="number" id="winnersCount" min="1" placeholder="Number of winners" class="border p-2 rounded w-32">
+</div>
+
+<!-- Winner Display -->
+<div id="winnerDisplay" class="text-center text-2xl font-bold text-green-700 mb-4"></div>
+
+<!-- Winner History -->
+<div class="mb-4">
+<h2 class="font-bold mb-2">Winner History:</h2>
+<ul id="winnersList" class="list-disc list-inside max-h-32 overflow-y-auto border p-2 rounded bg-white"></ul>
+<button id="clearHistory" class="mt-2 bg-red-600 hover:bg-red-700 text-white px-4 py-1 rounded">Clear History</button>
+</div>
+
+<!-- Leaderboard & Share -->
+<div class="mb-4">
+<h2 class="font-bold mb-2">Share & Leaderboard:</h2>
+<div class="flex gap-2 mb-2">
+<button id="showLeaderboard" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-1 rounded">Show Leaderboard</button>
+<button id="exportStats" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-1 rounded">Export Stats (CSV)</button>
+<button id="generateImageBtn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-1 rounded">Generate Winner Image</button>
+<button id="copyWinnerBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1 rounded">Copy Winner Info</button>
+</div>
+<canvas id="shareCanvas" width="500" height="500" class="border rounded bg-white"></canvas>
+<ul id="leaderboardList" class="list-disc list-inside max-h-48 overflow-y-auto border p-2 rounded bg-white"></ul>
+</div>
+
+<!-- Confetti Canvas -->
+<canvas id="confettiCanvas" class="absolute top-0 left-0 w-full h-full pointer-events-none"></canvas>
+
+<!-- Sounds -->
+<audio id="drumrollSound" src="https://www.myinstants.com/media/sounds/drum-roll.mp3"></audio>
+<audio id="cheerSound" src="https://www.myinstants.com/media/sounds/applause.mp3"></audio>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<script>
+// ======================== IndexedDB Setup ========================
+let db;
+const request = indexedDB.open("GiveawayDB",1);
+request.onupgradeneeded = e=>{
+    db = e.target.result;
+    db.createObjectStore("participants",{ keyPath:"id", autoIncrement:true }).createIndex("channelLink","channelLink",{unique:false});
+    db.createObjectStore("winners",{ keyPath:"id", autoIncrement:true });
+    db.createObjectStore("channels",{ keyPath:"link" });
+};
+request.onsuccess = e=>{ db=e.target.result; loadChannels(); loadParticipants(); loadWinners(); };
+
+// ======================== DOM Elements ========================
+const addChannelBtn=document.getElementById("addChannelBtn");
+const channelLinkInput=document.getElementById("channelLink");
+const channelSelect=document.getElementById("channelSelect");
+const addParticipantBtn=document.getElementById("addParticipantBtn");
+const participantName=document.getElementById("participantName");
+const participantAvatar=document.getElementById("participantAvatar");
+const participantEntriesInput=document.getElementById("participantEntries");
+const participantsList=document.getElementById("participantsList");
+const spinBtn=document.getElementById("spinBtn");
+const winnersCountInput=document.getElementById("winnersCount");
+const winnerDisplay=document.getElementById("winnerDisplay");
+const winnersList=document.getElementById("winnersList");
+const clearHistoryBtn=document.getElementById("clearHistory");
+const csvUpload=document.getElementById("csvUpload");
+const drumrollSound=document.getElementById("drumrollSound");
+const cheerSound=document.getElementById("cheerSound");
+const wheelCanvas=document.getElementById("wheelCanvas");
+const wheelCtx=wheelCanvas.getContext("2d");
+const shareCanvas=document.getElementById("shareCanvas");
+const shareCtx=shareCanvas.getContext("2d");
+const generateImageBtn=document.getElementById("generateImageBtn");
+const copyWinnerBtn=document.getElementById("copyWinnerBtn");
+const downloadLink=document.getElementById("downloadLink");
+const themeToggle=document.getElementById("themeToggle");
+const scheduleBtn=document.getElementById("scheduleBtn");
+const countdownElem=document.getElementById("countdown");
+let wheelParticipants=[], spinning=false, selectedChannel="", scheduledTimeout=false;
+
+// ======================== Theme Toggle ========================
+themeToggle.onclick=()=>document.body.classList.toggle("dark-mode");
+
+// ======================== Channel Management ========================
+addChannelBtn.onclick=()=>{
+    const link=channelLinkInput.value.trim();
+    if(!link) return;
+    db.transaction("channels","readwrite").objectStore("channels").put({link});
+    channelLinkInput.value="";
+    setTimeout(loadChannels,200);
+};
+channelSelect.onchange=()=>{ selectedChannel=channelSelect.value; loadParticipants(); };
+function loadChannels(){
+    channelSelect.innerHTML="";
+    db.transaction("channels","readonly").objectStore("channels").getAll().onsuccess=e=>{
+        e.target.result.forEach(c=>{
+            const option=document.createElement("option"); option.value=c.link; option.textContent=c.link; channelSelect.appendChild(option);
+        });
+        if(e.target.result.length>0 && !selectedChannel) selectedChannel=channelSelect.value;
+    };
+}
+
+// ======================== Participant Management ========================
+addParticipantBtn.onclick=()=>{
+    const name=participantName.value.trim(), avatar=participantAvatar.value.trim(), entries=parseInt(participantEntriesInput.value)||1;
+    if(!name||!selectedChannel) return;
+    db.transaction("participants","readwrite").objectStore("participants").add({name,avatarURL:avatar,channelLink:selectedChannel,entries}).oncomplete=loadParticipants;
+    participantName.value=""; participantAvatar.value=""; participantEntriesInput.value=1;
+};
+
+csvUpload.addEventListener("change",function(){
+    const file=csvUpload.files[0]; if(!file||!selectedChannel) return;
+    document.getElementById("loadingIndicator").classList.remove("hidden");
+    const reader=new FileReader();
+    reader.onload=e=>{
+        const lines=e.target.result.split("\n");
+        lines.forEach(line=>{
+            const [name,avatar,entries]=line.split(",");
+            if(name) db.transaction("participants","readwrite").objectStore("participants").add({name:name.trim(),avatarURL:(avatar||"").trim(),channelLink:selectedChannel,entries:parseInt(entries)||1});
+        });
+        setTimeout(()=>{ loadParticipants(); document.getElementById("loadingIndicator").classList.add("hidden"); },200);
+    };
+    reader.readAsText(file);
+});
+
+function loadParticipants(){
+    participantsList.innerHTML=""; wheelParticipants=[];
+    db.transaction("participants","readonly").objectStore("participants").getAll().onsuccess=e=>{
+        e.target.result.filter(p=>p.channelLink===selectedChannel).forEach(p=>{
+            participantsList.innerHTML+=`<li>${p.name} (x${p.entries})</li>`;
+            for(let i=0;i<p.entries;i++) wheelParticipants.push(p);
+        });
+        drawWheel();
+    };
+}
+
+// ======================== Winner Management ========================
+function loadWinners(){
+    winnersList.innerHTML="";
+    db.transaction("winners","readonly").objectStore("winners").getAll().onsuccess=e=>{
+        e.target.result.forEach(w=>{
+            winnersList.innerHTML+=`<li>${w.name} (${new Date(w.date).toLocaleString()})</li>`;
+        });
+    };
+}
+clearHistoryBtn.onclick=()=>{ db.transaction("winners","readwrite").objectStore("winners").clear().onsuccess=loadWinners; };
+
+// ======================== Wheel Drawing ========================
+function drawWheel(){
+    const ctx=wheelCtx,size=wheelCanvas.width,radius=size/2;
+    ctx.clearRect(0,0,size,size);
+    const count=wheelParticipants.length; if(count===0) return;
+    const angle=(2*Math.PI)/count;
+    const colorInput=document.getElementById("segmentColors").value.trim();
+    const colors=colorInput ? colorInput.split(",") : ["#FDE68A","#FBBF24"];
+    wheelParticipants.forEach((p,i)=>{
+        ctx.beginPath(); ctx.moveTo(radius,radius); ctx.arc(radius,radius,radius,i*angle,(i+1)*angle);
+        ctx.fillStyle=colors[i % colors.length]; ctx.fill(); ctx.stroke();
+        ctx.save(); ctx.translate(radius,radius); ctx.rotate(i*angle+angle/2);
+        ctx.textAlign="right"; ctx.fillStyle="#000"; ctx.font="14px Arial"; ctx.fillText(p.name,radius-30,0);
+        ctx.restore();
+    });
+}
+
+// ======================== Spin Logic ========================
+spinBtn.onclick=async()=>{
+    if(spinning||wheelParticipants.length===0) return;
+    spinning=true; drumrollSound.play();
+    const winnersCount=parseInt(winnersCountInput.value)||1;
+    let tempParticipants=[...wheelParticipants];
+    for(let n=0;n<winnersCount;n++){
+        await new Promise(resolve=>{
+            const start=0,target=Math.random()*2*Math.PI+6*Math.PI,duration=3000,startTime=performance.now();
+            function animate(now){
+                let t=(now-startTime)/duration; if(t>1) t=1; const eased=1-Math.pow(1-t,3);
+                wheelCanvas.style.transform=`rotate(${eased*target}rad)`;
+                if(t<1) requestAnimationFrame(animate); else {
+                    const winnerIndex=Math.floor(Math.random()*tempParticipants.length);
+                    const winner=tempParticipants[winnerIndex];
+                    winnerDisplay.textContent=`🎉 Winner: ${winner.name} 🎉`;
+                    winnerDisplay.classList.add("glow"); setTimeout(()=>winnerDisplay.classList.remove("glow"),2000);
+                    tempParticipants=tempParticipants.filter(p=>p.name!==winner.name);
+                    drawWheel(); confetti({particleCount:150,spread:60,origin:{y:0.6}}); cheerSound.play();
+                    db.transaction("winners","readwrite").objectStore("winners").add({...winner,date:new Date()});
+                    setTimeout(resolve,1500);
+                }
+            }
+            requestAnimationFrame(animate);
+        });
+    }
+    spinning=false;
+};
+
+// ======================== Scheduled Giveaway ========================
+scheduleBtn.onclick=()=>{
+    const scheduledInput=document.getElementById("scheduledTime").value; if(!scheduledInput) return alert("Select date & time!");
+    const scheduledDate=new Date(scheduledInput); const now=new Date(); const delay=scheduledDate-now;
+    if(delay<=0) return alert("Time must be in future!"); clearTimeout(scheduledTimeout);
+    function updateCountdown(){
+        const diff=scheduledDate-new Date();
+        if(diff<=0){ countdownElem.textContent="🎯 Giveaway Live! Spinning now..."; spinBtn.click(); }
+        else{ const h=Math.floor(diff/(1000*60*60)), m=Math.floor((diff%(1000*60*60))/(1000*60)), s=Math.floor((diff%(1000*60))/1000);
+            countdownElem.textContent=`Starts in: ${h}h ${m}m ${s}s`; scheduledTimeout=setTimeout(updateCountdown,1000); }
+    }
+    updateCountdown();
+};
+
+// ======================== Leaderboard & Share ========================
+document.getElementById("showLeaderboard").onclick=()=>{
+    const lb=document.getElementById("leaderboardList"); lb.innerHTML="";
+    db.transaction("winners","readonly").objectStore("winners").getAll().onsuccess=e=>{
+        const tally={}; e.target.result.forEach(w=>{ tally[w.name]=(tally[w.name]||0)+1; });
+        Object.entries(tally).sort((a,b)=>b[1]-a[1]).forEach(([name,wins])=>{ lb.innerHTML+=`<li>${name} - ${wins} win${wins>1?"s":""}</li>`; });
+    };
+};
+document.getElementById("exportStats").onclick=()=>{
+    db.transaction("winners","readonly").objectStore("winners").getAll().onsuccess=e=>{
+        const tally={}; e.target.result.forEach(w=>{ tally[w.name]=(tally[w.name]||0)+1; });
+        let csv="Name,Wins\n"; Object.entries(tally).forEach(([name,wins])=>{ csv+=`${name},${wins}\n`; });
+        const blob=new Blob([csv],{type:"text/csv"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="leaderboard.csv"; a.click();
+    };
+};
+generateImageBtn.onclick=()=>{
+    if(!winnerDisplay.textContent) return alert("No winner yet!");
+    shareCtx.clearRect(0,0,shareCanvas.width,shareCanvas.height);
+    shareCtx.fillStyle="#fff8f0"; shareCtx.fillRect(0,0,shareCanvas.width,shareCanvas.height);
+    shareCtx.fillStyle="#C47E2C"; shareCtx.font="bold 30px Arial"; shareCtx.textAlign="center";
+    shareCtx.fillText("🎉 Giveaway Winner 🎉", shareCanvas.width/2,50);
+    shareCtx.fillStyle="#16a34a"; shareCtx.font="bold 40px Arial";
+    shareCtx.fillText(winnerDisplay.textContent.replace("🎉 Winner: ","").replace(" 🎉",""), shareCanvas.width/2,shareCanvas.height/2);
+};
+copyWinnerBtn.onclick=()=>{ if(!winnerDisplay.textContent) return; navigator.clipboard.writeText(winnerDisplay.textContent).then(()=>alert("Winner info copied!")); };
+
+// ======================== Keyboard Shortcuts ========================
+participantName.addEventListener("keyup",e=>{ if(e.key==="Enter") addParticipantBtn.click(); });
+participantAvatar.addEventListener("keyup",e=>{ if(e.key==="Enter") addParticipantBtn.click(); });
+participantEntriesInput.addEventListener("keyup",e=>{ if(e.key==="Enter") addParticipantBtn.click(); });
+
+// ======================== Service Worker ========================
+if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('sw.js').then(()=>console.log("Service Worker Registered")).catch(err=>console.error(err));
+}
+</script>
+</div>
 </body>
 </html>

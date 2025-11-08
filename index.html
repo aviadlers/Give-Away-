@@ -3,166 +3,148 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Adlers Giveaway Picker</title>
+<title>Adler's Giveaway Picker - Multi-Winner Premium</title>
 <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <meta name="theme-color" content="#C47E2C">
 <style>
-:root {--primary:#C47E2C;--secondary:#F59E0B;--light:#FFF8F0;--dark:#1F2937;}
-body {transition:all 0.3s; background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);}
-body.dark-mode {background:linear-gradient(135deg,#1e3c72 0%,#2a5298 100%);}
-.container-glass {background:rgba(255,255,255,0.25);backdrop-filter:blur(10px);border-radius:20px;border:1px solid rgba(255,255,255,0.18);box-shadow:0 8px 32px rgba(31,38,135,0.37);}
-.dark-mode .container-glass {background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.1);}
-.btn-premium {background:linear-gradient(135deg,var(--primary),var(--secondary));color:white;padding:12px 24px;border-radius:50px;font-weight:600;box-shadow:0 4px 15px rgba(196,126,44,0.4);transition:all 0.3s;position:relative;overflow:hidden;}
-.btn-premium:hover{transform:translateY(-3px);box-shadow:0 8px 25px rgba(196,126,44,0.6);}
-.input-modern {border:2px solid transparent;background:rgba(255,255,255,0.9);border-radius:12px;padding:12px 16px;transition:all 0.3s;}
-.input-modern:focus{border-color:var(--primary);background:white;box-shadow:0 4px 20px rgba(196,126,44,0.3);transform:translateY(-2px);}
-.dark-mode .input-modern{background:rgba(55,65,81,0.9);color:white;}
-.card-modern {background:white;border-radius:16px;padding:20px;box-shadow:0 4px 20px rgba(0,0,0,0.1);transition:all 0.3s;border:1px solid rgba(0,0,0,0.05);}
-.dark-mode .card-modern {background:#374151;border:1px solid #4B5563;}
-.participant-item {display:flex;justify-content:space-between;align-items:center;padding:12px 16px;margin:8px 0;background:white;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.1);border-left:4px solid var(--primary);}
-.dark-mode .participant-item {background:#4B5563;}
-#confettiCanvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:50;}
-.gradient-text {background:linear-gradient(135deg,var(--primary),var(--secondary));-webkit-background-clip:text;-webkit-text-fill-color:transparent; background-clip:text;}
+:root { --primary:#C47E2C; --secondary:#F59E0B; --accent:#10B981; --dark:#1F2937; --light:#FFF8F0; }
+* { font-family:'Poppins',sans-serif; transition:all .3s ease; }
+body { background:linear-gradient(135deg,#667eea,#764ba2); min-height:100vh; padding:1rem; }
+body.dark-mode { background:linear-gradient(135deg,#1e3c72,#2a5298); color:white; }
+.container-glass { background:rgba(255,255,255,.25); backdrop-filter:blur(10px); border-radius:20px; border:1px solid rgba(255,255,255,.18); box-shadow:0 8px 32px rgba(31,38,135,.37); padding:1rem; margin-bottom:1rem; }
+.dark-mode .container-glass { background:rgba(0,0,0,.25); border:1px solid rgba(255,255,255,.1); }
+.gradient-text { background:linear-gradient(135deg,var(--primary),var(--secondary)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+.btn-premium { background:linear-gradient(135deg,var(--primary),var(--secondary)); color:white; padding:.5rem 1.5rem; border-radius:50px; font-weight:600; position:relative; overflow:hidden; transition:all .3s; }
+.btn-premium::before { content:''; position:absolute; top:0; left:-100%; width:100%; height:100%; background:linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent); transition:.5s; }
+.btn-premium:hover::before { left:100%; }
+.btn-premium:hover { transform:translateY(-3px); }
+.input-modern { border:2px solid transparent; border-radius:12px; padding:.5rem; box-shadow:0 2px 10px rgba(0,0,0,.1); width:100%; }
+.input-modern:focus { border-color: var(--primary); box-shadow:0 4px 20px rgba(196,126,44,.3); outline:none; }
+.card-modern { background:white; border-radius:16px; padding:1rem; box-shadow:0 4px 20px rgba(0,0,0,.1); margin-bottom:1rem; }
+.dark-mode .card-modern { background:#374151; border:1px solid #4B5563; }
+.participant-item { display:flex; justify-content:space-between; align-items:center; padding:.5rem; border-radius:12px; background:white; margin-bottom:.5rem; box-shadow:0 2px 8px rgba(0,0,0,.1); }
+.dark-mode .participant-item { background:#4B5563; color:white; }
+.participant-avatar { width:36px; height:36px; border-radius:50%; object-fit:cover; margin-right:.5rem; }
+.winner-badge { background: linear-gradient(135deg,#10B981,#34D399); color:white; padding:2px 10px; border-radius:20px; font-size:0.8em; font-weight:600; animation:bounce 2s infinite; }
+@keyframes bounce {0%,100%{transform:scale(1);}50%{transform:scale(1.1);}}
+.wheel-pointer { position:absolute; top:0; left:50%; transform:translateX(-50%) translateY(-2rem); z-index:10; }
 </style>
 </head>
-<body class="min-h-screen py-8">
+<body>
+<div class="max-w-6xl mx-auto">
 
-<div class="max-w-6xl mx-auto px-4">
-
-  <!-- Header -->
-  <div class="text-center mb-8">
-    <h1 class="text-5xl font-bold gradient-text mb-4">🎉 Adler's Giveaway Picker</h1>
-    <p class="text-xl text-white/90">The Ultimate Tool for Fair & Exciting Giveaways!</p>
+  <div class="flex justify-between mb-4">
+    <h1 class="text-4xl font-bold gradient-text">🎉 Adler's Giveaway Picker</h1>
+    <button id="themeToggle" class="btn-premium"><i class="fas fa-moon mr-2"></i>Toggle Theme</button>
   </div>
 
-  <!-- Controls -->
-  <div class="container-glass p-6 mb-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
-
-    <!-- Left -->
-    <div class="space-y-6">
-      <div class="flex justify-between items-center">
-        <button id="themeToggle" class="btn-premium"><i class="fas fa-moon mr-2"></i>Toggle Theme</button>
-        <button id="bulkDeleteBtn" class="btn-premium" style="background:linear-gradient(135deg,#ef4444,#f97316)"><i class="fas fa-trash mr-2"></i>Clear All</button>
+  <div class="grid lg:grid-cols-2 gap-4">
+    <!-- Left Panel -->
+    <div>
+      <div class="container-glass card-modern">
+        <h2 class="font-bold gradient-text mb-2"><i class="fas fa-user-plus mr-2"></i>Add Participant</h2>
+        <input type="text" id="participantName" class="input-modern mb-2" placeholder="Participant Name">
+        <input type="file" id="participantAvatarFile" class="input-modern mb-2">
+        <input type="number" id="participantEntries" class="input-modern mb-2" placeholder="Entries" min="1" value="1">
+        <button id="addParticipantBtn" class="btn-premium w-full mb-2"><i class="fas fa-plus mr-2"></i>Add Participant</button>
+        <button id="clearParticipants" class="btn-premium w-full mb-2" style="background: linear-gradient(135deg, #ef4444,#f97316);"><i class="fas fa-trash mr-2"></i>Clear Participants</button>
       </div>
 
-      <div class="card-modern">
-        <h2 class="text-xl font-bold gradient-text mb-4"><i class="fas fa-play-circle mr-2"></i>Channel Setup</h2>
-        <input id="channelLink" type="url" class="input-modern w-full mb-2" placeholder="Enter channel/video URL">
-        <button id="addChannelBtn" class="btn-premium w-full mb-2"><i class="fas fa-plus mr-2"></i>Add Channel</button>
-        <select id="channelSelect" class="input-modern w-full"><option>Select a channel...</option></select>
-      </div>
-
-      <div class="card-modern">
-        <h2 class="text-xl font-bold gradient-text mb-4"><i class="fas fa-user-plus mr-2"></i>Add Participants</h2>
-        <input id="participantName" type="text" class="input-modern w-full mb-2" placeholder="Participant Name">
-        <input id="participantAvatar" type="url" class="input-modern w-full mb-2" placeholder="Avatar URL (Optional)">
-        <div class="flex space-x-3">
-          <input id="participantEntries" type="number" class="input-modern flex-1" value="1" min="1">
-          <button id="addParticipantBtn" class="btn-premium"><i class="fas fa-plus mr-2"></i>Add</button>
-        </div>
+      <div class="container-glass card-modern">
+        <h2 class="font-bold gradient-text mb-2"><i class="fas fa-list mr-2"></i>Leaderboard</h2>
+        <div id="leaderboard" class="max-h-96 overflow-y-auto"></div>
       </div>
     </div>
 
-    <!-- Right -->
-    <div class="space-y-6">
-      <div class="card-modern text-center">
-        <h2 class="text-xl font-bold gradient-text mb-4"><i class="fas fa-sync-alt mr-2"></i>Giveaway Wheel</h2>
-        <div class="relative">
-          <div class="wheel-pointer absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-2 z-10">
-            <i class="fas fa-caret-down text-4xl text-red-500"></i>
-          </div>
-          <canvas id="wheelCanvas" width="400" height="400"></canvas>
+    <!-- Right Panel -->
+    <div>
+      <div class="container-glass card-modern text-center">
+        <h2 class="font-bold gradient-text mb-2"><i class="fas fa-sync-alt mr-2"></i>Giveaway Wheel</h2>
+        <div class="relative w-full flex justify-center">
+          <div class="wheel-pointer"><i class="fas fa-caret-down text-4xl text-red-500"></i></div>
+          <canvas id="wheelCanvas" style="max-width:100%; height:auto;"></canvas>
         </div>
-        <div class="mt-4">
-          <input id="winnersCount" type="number" class="input-modern w-32 text-center mb-2" min="1" max="10" value="1">
-          <button id="spinBtn" class="btn-premium px-8"><i class="fas fa-play mr-2"></i>Spin Wheel</button>
+        <div class="mt-4 flex justify-center space-x-2">
+          <input type="number" id="winnersCount" class="input-modern w-32 text-center" placeholder="Winners" min="1" max="10" value="1">
+          <button id="spinBtn" class="btn-premium px-8"><i class="fas fa-play mr-2"></i>Spin</button>
         </div>
       </div>
 
-      <div id="winnerDisplay" class="card-modern text-center min-h-[100px] flex items-center justify-center">
-        <p class="text-gray-500">Spin the wheel to reveal a winner!</p>
+      <div id="winnerDisplay" class="container-glass card-modern text-center min-h-[100px] flex flex-col items-center justify-center">
+        <p class="text-gray-500">Spin the wheel to reveal winners!</p>
       </div>
     </div>
-
   </div>
-
-  <!-- Participants & Winners -->
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-    <div class="container-glass p-6">
-      <h2 class="text-2xl font-bold gradient-text mb-4">Participants <span id="participantCount">(0)</span></h2>
-      <div id="participantsList" class="max-h-96 overflow-y-auto space-y-2"></div>
-    </div>
-    <div class="container-glass p-6">
-      <h2 class="text-2xl font-bold gradient-text mb-4">Winner History</h2>
-      <div id="winnersList" class="max-h-96 overflow-y-auto space-y-2"></div>
-      <button id="clearHistory" class="btn-premium w-full mt-4" style="background:linear-gradient(135deg,#ef4444,#f97316)"><i class="fas fa-broom mr-2"></i>Clear History</button>
-    </div>
-  </div>
-
 </div>
 
-<canvas id="confettiCanvas"></canvas>
+<canvas id="confettiCanvas" class="fixed top-0 left-0 w-full h-full pointer-events-none z-50"></canvas>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 <script>
-// Data
-let channels=[], selectedChannel=null, participants=[], winners=[];
-const canvas=document.getElementById("wheelCanvas"), ctx=canvas.getContext("2d");
+let participants=[],winnersHistory=[],spinning=false,rotation=0;
+const canvas=document.getElementById('wheelCanvas'),ctx=canvas.getContext('2d');
 
-// Functions
-function updateParticipantsList(){
-  const list=document.getElementById("participantsList"); list.innerHTML="";
-  participants.forEach(p=>{
-    const div=document.createElement("div"); div.className="participant-item";
-    div.innerHTML=`<div>${p.name} (${p.entries} entries)</div>`;
-    list.appendChild(div);
+function resizeCanvas(){const size=Math.min(canvas.parentElement.offsetWidth*0.95,window.innerHeight*0.5);canvas.width=size;canvas.height=size;drawWheel();}
+window.addEventListener('resize',resizeCanvas); resizeCanvas();
+
+document.getElementById('themeToggle').addEventListener('click',()=>{document.body.classList.toggle('dark-mode'); drawWheel();});
+
+document.getElementById('addParticipantBtn').addEventListener('click',async()=>{
+  const name=document.getElementById('participantName').value.trim();
+  const entries=parseInt(document.getElementById('participantEntries').value)||1;
+  const fileInput=document.getElementById('participantAvatarFile');
+  if(!name) return alert("Enter participant name");
+  let avatar='';
+  if(fileInput.files[0]) avatar=await fileToBase64(fileInput.files[0]);
+  participants.push({name,entries,avatar});
+  document.getElementById('participantName').value=''; fileInput.value='';
+  drawWheel(); renderLeaderboard();
+});
+
+document.getElementById('clearParticipants').addEventListener('click',()=>{participants=[]; winnersHistory=[]; drawWheel(); renderLeaderboard(); document.getElementById('winnerDisplay').innerHTML='<p class="text-gray-500">Spin the wheel to reveal winners!</p>';});
+
+function fileToBase64(file){return new Promise(resolve=>{const reader=new FileReader();reader.onload=e=>resolve(e.target.result);reader.readAsDataURL(file);});}
+
+function renderLeaderboard(){
+  const lb=document.getElementById('leaderboard'); lb.innerHTML='';
+  const sorted=participants.slice().sort((a,b)=>b.entries-a.entries);
+  sorted.forEach(p=>{
+    const div=document.createElement('div'); div.className='participant-item flex items-center';
+    div.innerHTML=`${p.avatar?`<img src="${p.avatar}" class="participant-avatar">`:''}<div>${p.name} (${p.entries} entries)</div>`;
+    lb.appendChild(div);
   });
-  document.getElementById("participantCount").innerText=`(${participants.length})`;
 }
+
 function drawWheel(){
-  const radius=canvas.width/2;
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  if(!participants.length){
-    ctx.fillStyle="#F3F4F6"; ctx.beginPath(); ctx.arc(radius,radius,radius,0,2*Math.PI); ctx.fill();
-    ctx.fillStyle="#9CA3AF"; ctx.font="16px Poppins"; ctx.textAlign="center"; ctx.fillText("Add participants to begin",radius,radius); return;
-  }
-  const angle=2*Math.PI/participants.length;
-  participants.forEach((p,i)=>{
-    const start=i*angle, end=(i+1)*angle;
-    ctx.beginPath(); ctx.moveTo(radius,radius); ctx.arc(radius,radius,radius,start,end); ctx.fillStyle=["#FDE68A","#FBBF24","#C47E2C","#F59E0B"][i%4]; ctx.fill();
-    ctx.strokeStyle="rgba(255,255,255,0.3)"; ctx.lineWidth=2; ctx.stroke();
-  });
+  const radius=canvas.width/2; ctx.clearRect(0,0,canvas.width,canvas.height);
+  if(!participants.length){ ctx.fillStyle="#374151"; ctx.beginPath(); ctx.arc(radius,radius,radius,0,2*Math.PI); ctx.fill(); ctx.fillStyle="#9CA3AF"; ctx.font="bold 16px Poppins"; ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.fillText("Add participants to begin",radius,radius); return;}
+  let totalEntries=participants.reduce((a,p)=>a+p.entries,0); let startAngle=rotation;
+  participants.forEach(p=>{for(let e=0;e<p.entries;e++){let angle=(2*Math.PI)/totalEntries; ctx.beginPath(); ctx.moveTo(radius,radius); ctx.arc(radius,radius,radius,startAngle,startAngle+angle); ctx.fillStyle=`hsl(${Math.random()*360},70%,50%)`; ctx.fill(); ctx.strokeStyle="rgba(255,255,255,0.2)"; ctx.lineWidth=2; ctx.stroke();
+    const midAngle=startAngle+angle/2; const textRadius=radius*0.7; const x=radius+Math.cos(midAngle)*textRadius; const y=radius+Math.sin(midAngle)*textRadius;
+    if(p.avatar){const img=new Image(); img.src=p.avatar; img.onload=()=>{ctx.save(); ctx.beginPath(); ctx.arc(x,y-radius*0.05,radius*0.08,0,2*Math.PI); ctx.closePath(); ctx.clip(); ctx.drawImage(img,x-radius*0.08,y-radius*0.08,radius*0.16,radius*0.16); ctx.restore();}} 
+    ctx.save(); ctx.translate(x,y); ctx.rotate(midAngle+Math.PI/2); ctx.fillStyle=document.body.classList.contains('dark-mode')?"white":"#1F2937"; ctx.font=`bold ${radius*0.07}px Poppins`; ctx.textAlign="center"; ctx.fillText(p.name,0,0); ctx.restore(); startAngle+=angle;}}); ctx.beginPath(); ctx.arc(radius,radius,radius*0.07,0,2*Math.PI); ctx.fillStyle="#fff"; ctx.fill(); ctx.strokeStyle="var(--primary)"; ctx.lineWidth=3; ctx.stroke();
 }
 
-// Event listeners
-document.getElementById("themeToggle").addEventListener("click",()=>{document.body.classList.toggle("dark-mode"); drawWheel();});
-document.getElementById("addParticipantBtn").addEventListener("click",()=>{
-  const name=document.getElementById("participantName").value.trim();
-  const entries=parseInt(document.getElementById("participantEntries").value)||1;
-  if(!name) return alert("Enter participant name!"); participants.push({name,entries});
-  document.getElementById("participantName").value=""; document.getElementById("participantEntries").value=1;
-  updateParticipantsList(); drawWheel();
+document.getElementById('spinBtn').addEventListener('click',()=>{
+  if(!participants.length) return alert("No participants!");
+  if(spinning) return;
+  spinning=true;
+  let winnersNum=Math.min(parseInt(document.getElementById('winnersCount').value)||1,participants.length);
+  let totalEntries=participants.reduce((a,p)=>a+p.entries,0);
+  let winnerIndices=[];
+  while(winnerIndices.length<winnersNum){ let idx=Math.floor(Math.random()*totalEntries); if(!winnerIndices.includes(idx)) winnerIndices.push(idx);}
+  let current=0;
+  function spinNext(){ if(current>=winnerIndices.length){ spinning=false; renderLeaderboard(); return;} let index=winnerIndices[current]; spinSingle(index,()=>{const winner=findWinner(index); winnersHistory.push(winner); showWinner(winner); current++; setTimeout(spinNext,1000);}); }
+  spinNext();
 });
-document.getElementById("bulkDeleteBtn").addEventListener("click",()=>{participants=[]; updateParticipantsList(); drawWheel();});
-document.getElementById("spinBtn").addEventListener("click",()=>{
-  if(!participants.length) return alert("Add participants!"); 
-  const winnerIndex=Math.floor(Math.random()*participants.length), winner=participants[winnerIndex];
-  winners.push(winner);
-  document.getElementById("winnerDisplay").innerHTML=`<div><div class="text-2xl font-bold text-green-500">🎉 ${winner.name} 🎉</div></div>`;
-  confetti({particleCount:200,spread:100,origin:{y:0.6}});
-  const winnersList=document.getElementById("winnersList");
-  const div=document.createElement("div"); div.innerText=winner.name; winnersList.appendChild(div);
-});
-document.getElementById("clearHistory").addEventListener("click",()=>{winners=[]; document.getElementById("winnersList").innerHTML="";});
-document.getElementById("addChannelBtn").addEventListener("click",()=>{
-  const link=document.getElementById("channelLink").value.trim(); if(!link) return alert("Enter channel!");
-  channels.push(link);
-  const select=document.getElementById("channelSelect"); const option=document.createElement("option"); option.value=link; option.innerText=link; select.appendChild(option);
-  document.getElementById("channelLink").value="";
-});
-document.getElementById("channelSelect").addEventListener("change",e=>{selectedChannel=e.target.value;});
-drawWheel();
+
+function spinSingle(index,callback){let totalEntries=participants.reduce((a,p)=>a+p.entries,0); let start=rotation; let target=start+(Math.PI*10)+(2*Math.PI*index/totalEntries); let duration=4000; let startTime=null; function animate(timestamp){if(!startTime) startTime=timestamp; let elapsed=timestamp-startTime; let progress=Math.min(elapsed/duration,1); rotation=start+(target-start)*(1-Math.pow(1-progress,3)); drawWheel(); if(progress<1) requestAnimationFrame(animate); else callback();} requestAnimationFrame(animate);}
+
+function findWinner(index){let total=0; for(let p of participants){ total+=p.entries; if(index<total) return p;}}
+
+function showWinner(w){const display=document.getElementById('winnerDisplay'); display.innerHTML=`<div class="text-center mb-2"><div class="text-2xl font-bold">🎉 Winner:</div><div class="text-2xl font-bold gradient-text">${w.name}</div></div>`; confetti({particleCount:200,spread:100,origin:{y:0.6}});}
+
 </script>
 </body>
 </html>

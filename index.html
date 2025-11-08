@@ -1,149 +1,786 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Adler's Giveaway Picker - Multi-Winner Premium</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Adler's Giveaway Picker — Phase 7 (Smooth Spin, Avatars, Multi-Winner)</title>
+
 <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<meta name="theme-color" content="#C47E2C">
+
 <style>
-:root { --primary:#C47E2C; --secondary:#F59E0B; --accent:#10B981; --dark:#1F2937; --light:#FFF8F0; }
-* { font-family:'Poppins',sans-serif; transition:all .3s ease; }
-body { background:linear-gradient(135deg,#667eea,#764ba2); min-height:100vh; padding:1rem; }
-body.dark-mode { background:linear-gradient(135deg,#1e3c72,#2a5298); color:white; }
-.container-glass { background:rgba(255,255,255,.25); backdrop-filter:blur(10px); border-radius:20px; border:1px solid rgba(255,255,255,.18); box-shadow:0 8px 32px rgba(31,38,135,.37); padding:1rem; margin-bottom:1rem; }
-.dark-mode .container-glass { background:rgba(0,0,0,.25); border:1px solid rgba(255,255,255,.1); }
-.gradient-text { background:linear-gradient(135deg,var(--primary),var(--secondary)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
-.btn-premium { background:linear-gradient(135deg,var(--primary),var(--secondary)); color:white; padding:.5rem 1.5rem; border-radius:50px; font-weight:600; position:relative; overflow:hidden; transition:all .3s; }
-.btn-premium::before { content:''; position:absolute; top:0; left:-100%; width:100%; height:100%; background:linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent); transition:.5s; }
-.btn-premium:hover::before { left:100%; }
-.btn-premium:hover { transform:translateY(-3px); }
-.input-modern { border:2px solid transparent; border-radius:12px; padding:.5rem; box-shadow:0 2px 10px rgba(0,0,0,.1); width:100%; }
-.input-modern:focus { border-color: var(--primary); box-shadow:0 4px 20px rgba(196,126,44,.3); outline:none; }
-.card-modern { background:white; border-radius:16px; padding:1rem; box-shadow:0 4px 20px rgba(0,0,0,.1); margin-bottom:1rem; }
-.dark-mode .card-modern { background:#374151; border:1px solid #4B5563; }
-.participant-item { display:flex; justify-content:space-between; align-items:center; padding:.5rem; border-radius:12px; background:white; margin-bottom:.5rem; box-shadow:0 2px 8px rgba(0,0,0,.1); }
-.dark-mode .participant-item { background:#4B5563; color:white; }
-.participant-avatar { width:36px; height:36px; border-radius:50%; object-fit:cover; margin-right:.5rem; }
-.winner-badge { background: linear-gradient(135deg,#10B981,#34D399); color:white; padding:2px 10px; border-radius:20px; font-size:0.8em; font-weight:600; animation:bounce 2s infinite; }
-@keyframes bounce {0%,100%{transform:scale(1);}50%{transform:scale(1.1);}}
-.wheel-pointer { position:absolute; top:0; left:50%; transform:translateX(-50%) translateY(-2rem); z-index:10; }
+:root {
+  --primary: #C47E2C;
+  --secondary: #F59E0B;
+  --accent: #10B981;
+  --card: rgba(255,255,255,0.06);
+}
+* { font-family: "Poppins", sans-serif; box-sizing: border-box; }
+body { margin:0; padding:1rem; background: linear-gradient(135deg,#4f46e5,#9333ea); color:#fff; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
+.container { max-width:1200px; margin:0 auto; }
+.header { display:flex; justify-content:space-between; align-items:center; gap:1rem; margin-bottom:1rem; }
+.title { font-size:1.75rem; font-weight:700; background: linear-gradient(135deg,var(--primary),var(--secondary)); -webkit-background-clip:text; color:transparent; -webkit-text-fill-color:transparent; }
+.btn { background:linear-gradient(135deg,var(--primary),var(--secondary)); color:#fff; padding:0.6rem 1rem; border-radius:999px; border:none; font-weight:600; cursor:pointer; }
+.card { background: var(--card); border-radius:14px; padding:1rem; box-shadow:0 8px 30px rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.06); }
+.input { width:100%; padding:0.6rem; border-radius:10px; border:1px solid rgba(255,255,255,0.06); background:rgba(255,255,255,0.03); color:#fff; outline:none; }
+.small { font-size:0.85rem; color:rgba(255,255,255,0.85); }
+.grid { display:grid; gap:1rem; }
+.grid-2 { grid-template-columns: 1fr 520px; align-items:start; }
+.row { display:flex; gap:0.5rem; align-items:center; }
+
+.participant-item { display:flex; align-items:center; gap:0.75rem; padding:0.5rem; border-radius:10px; background: rgba(0,0,0,0.15); }
+.participant-avatar { width:44px; height:44px; border-radius:50%; object-fit:cover; border:2px solid rgba(255,255,255,0.08); box-shadow:0 6px 18px rgba(0,0,0,0.4); }
+
+.leaderboard-list, .history-list { max-height:320px; overflow:auto; display:flex; flex-direction:column; gap:0.5rem; padding-right:0.25rem; }
+
+.wheel-wrap { display:flex; flex-direction:column; align-items:center; gap:0.75rem; }
+.wheel-pointer { position:relative; top:-28px; z-index:40; color:#ff3b30; filter:drop-shadow(0 6px 20px rgba(0,0,0,0.45)); }
+.canvas-card { position:relative; width:100%; display:flex; justify-content:center; align-items:center; }
+.canvas-container { width:100%; max-width:520px; }
+
+.controls { display:flex; gap:0.5rem; align-items:center; justify-content:center; margin-top:0.5rem; }
+
+.winner-badge { background:linear-gradient(135deg,#10B981,#34D399); color:white; padding:6px 12px; border-radius:999px; font-weight:700; }
+
+.actions { display:flex; gap:0.5rem; flex-wrap:wrap; margin-top:0.75rem; }
+
+@media (max-width:900px){
+  .grid-2 { grid-template-columns: 1fr; }
+  .canvas-container { max-width:420px; }
+}
 </style>
 </head>
 <body>
-<div class="max-w-6xl mx-auto">
-
-  <div class="flex justify-between mb-4">
-    <h1 class="text-4xl font-bold gradient-text">🎉 Adler's Giveaway Picker</h1>
-    <button id="themeToggle" class="btn-premium"><i class="fas fa-moon mr-2"></i>Toggle Theme</button>
+<div class="container">
+  <div class="header">
+    <div>
+      <div class="title">🎉 Adler's Giveaway Picker — Phase 7</div>
+      <div class="small">Smooth spin, crisp avatars, accurate multi-winner saving</div>
+    </div>
+    <div class="row">
+      <button id="themeToggle" class="btn">Toggle Theme</button>
+    </div>
   </div>
 
-  <div class="grid lg:grid-cols-2 gap-4">
-    <!-- Left Panel -->
-    <div>
-      <div class="container-glass card-modern">
-        <h2 class="font-bold gradient-text mb-2"><i class="fas fa-user-plus mr-2"></i>Add Participant</h2>
-        <input type="text" id="participantName" class="input-modern mb-2" placeholder="Participant Name">
-        <input type="file" id="participantAvatarFile" class="input-modern mb-2">
-        <input type="number" id="participantEntries" class="input-modern mb-2" placeholder="Entries" min="1" value="1">
-        <button id="addParticipantBtn" class="btn-premium w-full mb-2"><i class="fas fa-plus mr-2"></i>Add Participant</button>
-        <button id="clearParticipants" class="btn-premium w-full mb-2" style="background: linear-gradient(135deg, #ef4444,#f97316);"><i class="fas fa-trash mr-2"></i>Clear Participants</button>
+  <div class="grid grid-2">
+    <!-- LEFT: Controls, leaderboard, history -->
+    <div class="grid" style="grid-auto-rows:min-content;">
+
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">
+          <div style="font-weight:700">Add Participant</div>
+          <div class="small">Upload avatar or paste an image URL → appears on wheel</div>
+        </div>
+
+        <input id="nameInput" class="input" placeholder="Participant name (required)" />
+        <input id="avatarFile" type="file" accept="image/*" class="input" style="margin-top:0.5rem;" />
+        <input id="avatarUrl" class="input" placeholder="Or paste avatar image URL (optional)" style="margin-top:0.5rem;" />
+        <div class="row" style="margin-top:0.5rem;">
+          <input id="entriesInput" type="number" min="1" value="1" class="input" style="width:120px;" />
+          <button id="addBtn" class="btn">Add</button>
+          <button id="bulkCsvBtn" class="btn" title="Import CSV (name,entries,avatarUrl) -- avatar optional">Import CSV</button>
+        </div>
+
+        <div style="display:flex; gap:0.5rem; margin-top:0.6rem;">
+          <button id="clearAllBtn" class="btn" style="background:linear-gradient(135deg,#ef4444,#f97316);">Clear All</button>
+          <button id="exportCsvBtn" class="btn" style="background:linear-gradient(135deg,#f59e0b,#fbbf24);">Export CSV</button>
+        </div>
       </div>
 
-      <div class="container-glass card-modern">
-        <h2 class="font-bold gradient-text mb-2"><i class="fas fa-list mr-2"></i>Leaderboard</h2>
-        <div id="leaderboard" class="max-h-96 overflow-y-auto"></div>
+      <div class="card" style="margin-top:0.75rem;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div style="font-weight:700">Leaderboard</div>
+          <div class="small">Sorted by entries</div>
+        </div>
+        <div id="leaderboard" class="leaderboard-list" style="margin-top:0.6rem;"></div>
+      </div>
+
+      <div class="card" style="margin-top:0.75rem;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div style="font-weight:700">Winner History</div>
+          <div class="small">Most recent first</div>
+        </div>
+        <div id="history" class="history-list" style="margin-top:0.6rem;"></div>
+        <div style="margin-top:0.6rem; display:flex; gap:0.5rem;">
+          <button id="clearHistoryBtn" class="btn" style="background:linear-gradient(135deg,#ef4444,#f97316);">Clear History</button>
+          <button id="copyLastWinnerBtn" class="btn">Copy Last Winner</button>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:0.75rem;">
+        <div style="font-weight:700; margin-bottom:0.5rem;">Schedule Automatic Spin</div>
+        <input id="scheduleInput" type="datetime-local" class="input" />
+        <div style="display:flex; gap:0.5rem; margin-top:0.5rem;">
+          <button id="scheduleBtn" class="btn">Schedule Spin</button>
+          <button id="cancelScheduleBtn" class="btn" style="background:linear-gradient(135deg,#ef4444,#f97316);">Cancel</button>
+        </div>
+        <div id="scheduleStatus" class="small" style="margin-top:0.5rem;"></div>
       </div>
     </div>
 
-    <!-- Right Panel -->
-    <div>
-      <div class="container-glass card-modern text-center">
-        <h2 class="font-bold gradient-text mb-2"><i class="fas fa-sync-alt mr-2"></i>Giveaway Wheel</h2>
-        <div class="relative w-full flex justify-center">
-          <div class="wheel-pointer"><i class="fas fa-caret-down text-4xl text-red-500"></i></div>
-          <canvas id="wheelCanvas" style="max-width:100%; height:auto;"></canvas>
+    <!-- RIGHT: Wheel and controls -->
+    <div class="grid" style="grid-auto-rows:min-content;">
+      <div class="card wheel-wrap">
+        <div class="wheel-pointer">
+          <i class="fas fa-caret-down fa-3x"></i>
         </div>
-        <div class="mt-4 flex justify-center space-x-2">
-          <input type="number" id="winnersCount" class="input-modern w-32 text-center" placeholder="Winners" min="1" max="10" value="1">
-          <button id="spinBtn" class="btn-premium px-8"><i class="fas fa-play mr-2"></i>Spin</button>
+        <div class="canvas-card">
+          <div class="canvas-container card" style="padding:0;">
+            <canvas id="wheel" style="display:block; width:100%; height:auto;"></canvas>
+          </div>
         </div>
+        <div class="controls">
+          <input id="winnersCount" type="number" min="1" max="10" value="1" class="input" style="width:110px;" />
+          <button id="spinBtn" class="btn">Spin</button>
+          <button id="respinBtn" class="btn" style="display:none;">Re-spin</button>
+        </div>
+        <div id="spinProgress" class="small" style="margin-top:0.5rem;"></div>
       </div>
 
-      <div id="winnerDisplay" class="container-glass card-modern text-center min-h-[100px] flex flex-col items-center justify-center">
-        <p class="text-gray-500">Spin the wheel to reveal winners!</p>
+      <div id="winnerDisplay" class="card" style="margin-top:0.75rem; text-align:center;">
+        <div style="font-weight:700;">Winner(s)</div>
+        <div id="winnerList" style="margin-top:0.5rem;"></div>
       </div>
     </div>
   </div>
 </div>
 
-<canvas id="confettiCanvas" class="fixed top-0 left-0 w-full h-full pointer-events-none z-50"></canvas>
+<!-- confetti canvas library -->
+<canvas id="confettiCanvas" style="position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:9999;"></canvas>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
 <script>
-let participants=[],winnersHistory=[],spinning=false,rotation=0;
-const canvas=document.getElementById('wheelCanvas'),ctx=canvas.getContext('2d');
+/* ------------------------------
+   Phase 7 code: smooth spin + preloaded avatars + correct multi-winner recording
+   ------------------------------ */
 
-function resizeCanvas(){const size=Math.min(canvas.parentElement.offsetWidth*0.95,window.innerHeight*0.5);canvas.width=size;canvas.height=size;drawWheel();}
-window.addEventListener('resize',resizeCanvas); resizeCanvas();
+const dpr = Math.max(1, window.devicePixelRatio || 1);
 
-document.getElementById('themeToggle').addEventListener('click',()=>{document.body.classList.toggle('dark-mode'); drawWheel();});
+/* ---------- State ---------- */
+let participants = []; // entries stored as { id, name, entries, avatarUrl, image (HTMLImageElement|null) }
+let winnersHistory = []; // array of winner objects (same shape)
+let spinning = false;
+let rotation = 0; // current rotation in radians
+let scheduleTimeout = null;
 
-document.getElementById('addParticipantBtn').addEventListener('click',async()=>{
-  const name=document.getElementById('participantName').value.trim();
-  const entries=parseInt(document.getElementById('participantEntries').value)||1;
-  const fileInput=document.getElementById('participantAvatarFile');
-  if(!name) return alert("Enter participant name");
-  let avatar='';
-  if(fileInput.files[0]) avatar=await fileToBase64(fileInput.files[0]);
-  participants.push({name,entries,avatar});
-  document.getElementById('participantName').value=''; fileInput.value='';
-  drawWheel(); renderLeaderboard();
-});
+/* ---------- Elements ---------- */
+const wheel = document.getElementById('wheel');
+const ctx = wheel.getContext('2d');
+const nameInput = document.getElementById('nameInput');
+const avatarFile = document.getElementById('avatarFile');
+const avatarUrl = document.getElementById('avatarUrl');
+const entriesInput = document.getElementById('entriesInput');
+const addBtn = document.getElementById('addBtn');
+const spinBtn = document.getElementById('spinBtn');
+const respinBtn = document.getElementById('respinBtn');
+const winnersCountInput = document.getElementById('winnersCount');
+const leaderboardEl = document.getElementById('leaderboard');
+const historyEl = document.getElementById('history');
+const winnerListEl = document.getElementById('winnerList');
+const clearAllBtn = document.getElementById('clearAllBtn');
+const exportCsvBtn = document.getElementById('exportCsvBtn');
+const bulkCsvBtn = document.getElementById('bulkCsvBtn');
+const scheduleBtn = document.getElementById('scheduleBtn');
+const cancelScheduleBtn = document.getElementById('cancelScheduleBtn');
+const scheduleInput = document.getElementById('scheduleInput');
+const scheduleStatus = document.getElementById('scheduleStatus');
+const spinProgress = document.getElementById('spinProgress');
+const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+const copyLastWinnerBtn = document.getElementById('copyLastWinnerBtn');
+const exportCsvParticipantsBtn = document.getElementById('exportCsvBtn');
+const themeToggle = document.getElementById('themeToggle');
 
-document.getElementById('clearParticipants').addEventListener('click',()=>{participants=[]; winnersHistory=[]; drawWheel(); renderLeaderboard(); document.getElementById('winnerDisplay').innerHTML='<p class="text-gray-500">Spin the wheel to reveal winners!</p>';});
+/* ---------- Canvas sizing and high-DPI handling ---------- */
+function resizeWheelCanvas() {
+  const container = wheel.parentElement;
+  const cssWidth = Math.min(container.clientWidth * 0.96, 520);
+  const cssHeight = cssWidth;
+  wheel.style.width = cssWidth + 'px';
+  wheel.style.height = cssHeight + 'px';
+  // set actual canvas pixels
+  wheel.width = Math.round(cssWidth * dpr);
+  wheel.height = Math.round(cssHeight * dpr);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0); // scale to css pixels
+  drawWheel();
+}
+window.addEventListener('resize', resizeWheelCanvas);
+resizeWheelCanvas();
 
-function fileToBase64(file){return new Promise(resolve=>{const reader=new FileReader();reader.onload=e=>resolve(e.target.result);reader.readAsDataURL(file);});}
+/* ---------- Utilities ---------- */
+function uid() { return Math.random().toString(36).slice(2, 9); }
 
-function renderLeaderboard(){
-  const lb=document.getElementById('leaderboard'); lb.innerHTML='';
-  const sorted=participants.slice().sort((a,b)=>b.entries-a.entries);
-  sorted.forEach(p=>{
-    const div=document.createElement('div'); div.className='participant-item flex items-center';
-    div.innerHTML=`${p.avatar?`<img src="${p.avatar}" class="participant-avatar">`:''}<div>${p.name} (${p.entries} entries)</div>`;
-    lb.appendChild(div);
+function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+
+/* Preload image from URL or data URL, returns Promise<HTMLImageElement> */
+function loadImage(url) {
+  return new Promise((resolve) => {
+    if (!url) return resolve(null);
+    const img = new Image();
+    img.crossOrigin = "Anonymous"; // allow cross-origin if possible
+    img.onload = () => resolve(img);
+    img.onerror = () => resolve(null);
+    img.src = url;
   });
 }
 
-function drawWheel(){
-  const radius=canvas.width/2; ctx.clearRect(0,0,canvas.width,canvas.height);
-  if(!participants.length){ ctx.fillStyle="#374151"; ctx.beginPath(); ctx.arc(radius,radius,radius,0,2*Math.PI); ctx.fill(); ctx.fillStyle="#9CA3AF"; ctx.font="bold 16px Poppins"; ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.fillText("Add participants to begin",radius,radius); return;}
-  let totalEntries=participants.reduce((a,p)=>a+p.entries,0); let startAngle=rotation;
-  participants.forEach(p=>{for(let e=0;e<p.entries;e++){let angle=(2*Math.PI)/totalEntries; ctx.beginPath(); ctx.moveTo(radius,radius); ctx.arc(radius,radius,radius,startAngle,startAngle+angle); ctx.fillStyle=`hsl(${Math.random()*360},70%,50%)`; ctx.fill(); ctx.strokeStyle="rgba(255,255,255,0.2)"; ctx.lineWidth=2; ctx.stroke();
-    const midAngle=startAngle+angle/2; const textRadius=radius*0.7; const x=radius+Math.cos(midAngle)*textRadius; const y=radius+Math.sin(midAngle)*textRadius;
-    if(p.avatar){const img=new Image(); img.src=p.avatar; img.onload=()=>{ctx.save(); ctx.beginPath(); ctx.arc(x,y-radius*0.05,radius*0.08,0,2*Math.PI); ctx.closePath(); ctx.clip(); ctx.drawImage(img,x-radius*0.08,y-radius*0.08,radius*0.16,radius*0.16); ctx.restore();}} 
-    ctx.save(); ctx.translate(x,y); ctx.rotate(midAngle+Math.PI/2); ctx.fillStyle=document.body.classList.contains('dark-mode')?"white":"#1F2937"; ctx.font=`bold ${radius*0.07}px Poppins`; ctx.textAlign="center"; ctx.fillText(p.name,0,0); ctx.restore(); startAngle+=angle;}}); ctx.beginPath(); ctx.arc(radius,radius,radius*0.07,0,2*Math.PI); ctx.fillStyle="#fff"; ctx.fill(); ctx.strokeStyle="var(--primary)"; ctx.lineWidth=3; ctx.stroke();
+/* Convert file to data URL */
+function fileToDataUrl(file) {
+  return new Promise(resolve => {
+    const fr = new FileReader();
+    fr.onload = e => resolve(e.target.result);
+    fr.readAsDataURL(file);
+  });
 }
 
-document.getElementById('spinBtn').addEventListener('click',()=>{
-  if(!participants.length) return alert("No participants!");
-  if(spinning) return;
-  spinning=true;
-  let winnersNum=Math.min(parseInt(document.getElementById('winnersCount').value)||1,participants.length);
-  let totalEntries=participants.reduce((a,p)=>a+p.entries,0);
-  let winnerIndices=[];
-  while(winnerIndices.length<winnersNum){ let idx=Math.floor(Math.random()*totalEntries); if(!winnerIndices.includes(idx)) winnerIndices.push(idx);}
-  let current=0;
-  function spinNext(){ if(current>=winnerIndices.length){ spinning=false; renderLeaderboard(); return;} let index=winnerIndices[current]; spinSingle(index,()=>{const winner=findWinner(index); winnersHistory.push(winner); showWinner(winner); current++; setTimeout(spinNext,1000);}); }
-  spinNext();
+/* ---------- Add participant (preload avatar) ---------- */
+addBtn.addEventListener('click', async () => {
+  const name = (nameInput.value || '').trim();
+  if (!name) return alert('Please enter a name.');
+  const entries = Math.max(1, parseInt(entriesInput.value) || 1);
+  let avatar = (avatarUrl.value || '').trim();
+
+  if (avatarFile.files && avatarFile.files[0]) {
+    // if file chosen, convert to data URL (safer)
+    avatar = await fileToDataUrl(avatarFile.files[0]);
+  }
+
+  // create participant object and preload image
+  const id = uid();
+  const participant = { id, name, entries, avatarUrl: avatar || '', image: null };
+  if (participant.avatarUrl) {
+    participant.image = await loadImage(participant.avatarUrl);
+  }
+
+  participants.push(participant);
+  // reset inputs
+  nameInput.value = '';
+  avatarFile.value = '';
+  avatarUrl.value = '';
+  entriesInput.value = '1';
+
+  renderLeaderboard();
+  drawWheel();
 });
 
-function spinSingle(index,callback){let totalEntries=participants.reduce((a,p)=>a+p.entries,0); let start=rotation; let target=start+(Math.PI*10)+(2*Math.PI*index/totalEntries); let duration=4000; let startTime=null; function animate(timestamp){if(!startTime) startTime=timestamp; let elapsed=timestamp-startTime; let progress=Math.min(elapsed/duration,1); rotation=start+(target-start)*(1-Math.pow(1-progress,3)); drawWheel(); if(progress<1) requestAnimationFrame(animate); else callback();} requestAnimationFrame(animate);}
+/* Bulk CSV import (name,entries,avatarUrl) */
+bulkCsvBtn.addEventListener('click', () => {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.csv,text/csv';
+  input.onchange = async (e) => {
+    const f = e.target.files[0];
+    if (!f) return;
+    const text = await f.text();
+    const lines = text.split(/\r?\n/).filter(Boolean);
+    for (const line of lines) {
+      const parts = line.split(',');
+      const name = (parts[0] || '').trim();
+      const entries = Math.max(1, parseInt(parts[1]) || 1);
+      const avatar = (parts[2] || '').trim();
+      if (!name) continue;
+      const p = { id: uid(), name, entries, avatarUrl: avatar || '', image: null };
+      if (p.avatarUrl) p.image = await loadImage(p.avatarUrl);
+      participants.push(p);
+    }
+    renderLeaderboard();
+    drawWheel();
+  };
+  input.click();
+});
 
-function findWinner(index){let total=0; for(let p of participants){ total+=p.entries; if(index<total) return p;}}
+/* Export participants to CSV */
+exportCsvBtn.addEventListener('click', () => {
+  if (!participants.length) return alert('No participants to export.');
+  const rows = participants.map(p => `"${p.name.replace(/"/g,'""')}",${p.entries},"${(p.avatarUrl||'').replace(/"/g,'""')}"`);
+  const csv = 'Name,Entries,Avatar\n' + rows.join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'participants.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+});
 
-function showWinner(w){const display=document.getElementById('winnerDisplay'); display.innerHTML=`<div class="text-center mb-2"><div class="text-2xl font-bold">🎉 Winner:</div><div class="text-2xl font-bold gradient-text">${w.name}</div></div>`; confetti({particleCount:200,spread:100,origin:{y:0.6}});}
+/* Clear all */
+clearAllBtn.addEventListener('click', () => {
+  if (!confirm('Clear all participants and history?')) return;
+  participants = [];
+  winnersHistory = [];
+  renderLeaderboard();
+  renderHistory();
+  drawWheel();
+  renderWinnersUI();
+});
+
+/* Clear history */
+clearHistoryBtn.addEventListener('click', () => {
+  winnersHistory = [];
+  renderHistory();
+  renderWinnersUI();
+});
+
+/* Copy last winner name */
+copyLastWinnerBtn.addEventListener('click', () => {
+  if (!winnersHistory.length) return alert('No winner yet.');
+  navigator.clipboard.writeText(winnersHistory[winnersHistory.length - 1].name)
+    .then(()=> alert('Last winner copied to clipboard.'))
+    .catch(()=> alert('Copy failed.'));
+});
+
+/* Schedule spin */
+scheduleBtn.addEventListener('click', () => {
+  const val = scheduleInput.value;
+  if (!val) return alert('Pick a future date/time.');
+  const when = new Date(val);
+  const now = new Date();
+  if (when <= now) return alert('Pick a future date/time (later).');
+
+  if (scheduleTimeout) { clearTimeout(scheduleTimeout); scheduleTimeout = null; }
+
+  const ms = when.getTime() - now.getTime();
+  scheduleTimeout = setTimeout(() => {
+    scheduleTimeout = null;
+    scheduleStatus.textContent = '';
+    spinWheel();
+    alert('Scheduled spin executed.');
+  }, ms);
+
+  scheduleStatus.textContent = `Scheduled in ${(ms / 1000 / 60).toFixed(1)} minutes.`;
+});
+
+/* Cancel schedule */
+cancelScheduleBtn.addEventListener('click', () => {
+  if (scheduleTimeout) {
+    clearTimeout(scheduleTimeout);
+    scheduleTimeout = null;
+    scheduleStatus.textContent = 'Schedule cancelled.';
+  } else {
+    scheduleStatus.textContent = 'No active schedule.';
+  }
+});
+
+/* Theme toggle */
+themeToggle.addEventListener('click', () => {
+  document.body.classList.toggle('dark-mode');
+  drawWheel();
+});
+
+/* ---------- Rendering: Leaderboard & History ---------- */
+function renderLeaderboard() {
+  // aggregate by name (if duplicates), but we keep participants as raw items so entries as inserted are respected
+  const container = leaderboardEl;
+  container.innerHTML = '';
+  // sort by entries descending
+  const sorted = participants.slice().sort((a, b) => b.entries - a.entries);
+  for (const p of sorted) {
+    const row = document.createElement('div');
+    row.className = 'participant-item';
+    row.innerHTML = `
+      <div style="display:flex;align-items:center;">
+        ${p.image ? `<img src="${p.avatarUrl}" class="participant-avatar">` : `<div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#111,#333);display:inline-block;margin-right:0.6rem;"></div>`}
+        <div>
+          <div style="font-weight:600">${escapeHtml(p.name)}</div>
+          <div class="small">${p.entries} entries</div>
+        </div>
+      </div>
+    `;
+    container.appendChild(row);
+  }
+}
+
+function renderHistory() {
+  const container = historyEl;
+  container.innerHTML = '';
+  for (let i = winnersHistory.length - 1; i >= 0; i--) {
+    const w = winnersHistory[i];
+    const row = document.createElement('div');
+    row.className = 'participant-item';
+    row.innerHTML = `
+      ${w.image ? `<img src="${w.avatarUrl}" class="participant-avatar">` : ''}
+      <div style="font-weight:600">${escapeHtml(w.name)}</div>
+    `;
+    container.appendChild(row);
+  }
+}
+
+/* Winner UI */
+function renderWinnersUI() {
+  const list = winnerListEl;
+  list.innerHTML = '';
+  if (!winnersHistory.length) {
+    list.innerHTML = `<div class="small">No winners yet</div>`;
+    return;
+  }
+  // show last 5 winners
+  const show = winnersHistory.slice(-5).reverse();
+  for (const w of show) {
+    const el = document.createElement('div');
+    el.className = 'participant-item';
+    el.innerHTML = `
+      ${w.image ? `<img src="${w.avatarUrl}" class="participant-avatar">` : ''}
+      <div style="display:flex;flex-direction:column;">
+        <div style="font-weight:700">${escapeHtml(w.name)}</div>
+        <div class="small">Winner</div>
+      </div>
+    `;
+    list.appendChild(el);
+  }
+}
+
+/* HTML escape for safety */
+function escapeHtml(s) { return (s+'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+/* ---------- Wheel drawing ---------- */
+/* Approach:
+   - Build an array of "entries", duplicates per "entries" count.
+   - Segments start at angle -PI/2 (top), so center of entry i is at angle = -PI/2 + (i+0.5)*angle + rotation
+   - To land on index i, rotation should satisfy: -PI/2 + rotation + (i+0.5)*angle = -PI/2  => rotation = - (i+0.5)*angle (mod 2π)
+   - We compute a delta rotation = normalize( targetRotation - currentRotation ) + (fullSpins * 2π)
+*/
+
+function buildEntriesArray() {
+  const arr = [];
+  for (const p of participants) {
+    for (let j = 0; j < p.entries; j++) {
+      arr.push({ participant: p });
+    }
+  }
+  return arr;
+}
+
+function drawWheel() {
+  const size = Math.min(wheel.parentElement.clientWidth * 0.96, 520);
+  // canvas already sized in resizeWheelCanvas with DPR; we draw in CSS pixels due to ctx.setTransform
+  const w = wheel.width / dpr;
+  const h = wheel.height / dpr;
+  const radius = w / 2;
+  // clear
+  ctx.clearRect(0, 0, w, h);
+
+  // background circle
+  ctx.save();
+  ctx.translate(0,0);
+
+  const entries = buildEntriesArray();
+  if (!entries.length) {
+    // empty state
+    ctx.fillStyle = '#22262E';
+    ctx.beginPath(); ctx.arc(radius, radius, radius - 2, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#9CA3AF';
+    ctx.font = `${Math.max(12, radius*0.06)}px Poppins`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('Add participants to begin', radius, radius);
+    ctx.restore();
+    return;
+  }
+
+  const total = entries.length;
+  const angleStep = (Math.PI * 2) / total;
+  // start angle at -pi/2 (top) + rotation
+  let startAngle = -Math.PI/2 + rotation;
+
+  // draw each entry segment
+  for (let i = 0; i < total; i++) {
+    const entry = entries[i];
+    const sa = startAngle;
+    const ea = startAngle + angleStep;
+
+    // nicer color: compute hue based on owner id hash for stability
+    const hue = (hashCode(entry.participant.id) % 360 + (i*7)) % 360;
+    ctx.fillStyle = `hsl(${hue}, 72%, 48%)`;
+    ctx.beginPath();
+    ctx.moveTo(radius, radius);
+    ctx.arc(radius, radius, radius - 4, sa, ea);
+    ctx.closePath();
+    ctx.fill();
+
+    // segment border
+    ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // draw avatar (preloaded) or initials
+    const mid = (sa + ea) / 2;
+    const textRadius = radius * 0.58;
+    const cx = radius + Math.cos(mid) * textRadius;
+    const cy = radius + Math.sin(mid) * textRadius;
+
+    // draw avatar circle
+    const imgR = Math.max(12, radius * 0.09);
+    const pimg = entry.participant.image;
+    if (pimg && pimg.complete) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(cx, cy - imgR * 0.2, imgR, 0, Math.PI * 2);
+      ctx.closePath();
+      ctx.clip();
+      // draw image with slight oversampling for quality
+      ctx.drawImage(pimg, cx - imgR, cy - imgR - imgR*0.2, imgR*2, imgR*2);
+      ctx.restore();
+
+      // glossy border
+      ctx.beginPath();
+      ctx.arc(cx, cy - imgR * 0.2, imgR + 2, 0, Math.PI*2);
+      ctx.strokeStyle = 'rgba(255,255,255,0.28)';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    } else {
+      // initials circle
+      ctx.beginPath();
+      ctx.arc(cx, cy - imgR * 0.2, imgR, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(0,0,0,0.18)';
+      ctx.fill();
+      ctx.fillStyle = '#fff';
+      ctx.font = `bold ${imgR}px Poppins`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText((entry.participant.name[0] || '?').toUpperCase(), cx, cy - imgR * 0.2);
+    }
+
+    // draw name rotated a bit to follow orientation
+    ctx.save();
+    ctx.translate(cx, cy + imgR * 0.8);
+    ctx.rotate(mid + Math.PI/2);
+    ctx.fillStyle = 'rgba(255,255,255,0.95)';
+    ctx.font = `600 ${Math.max(10, radius*0.06)}px Poppins`;
+    ctx.textAlign = 'center';
+    ctx.fillText(shorten(entry.participant.name, 18), 0, 0);
+    ctx.restore();
+
+    startAngle = ea;
+  }
+
+  // center hub circle
+  ctx.beginPath();
+  ctx.arc(radius, radius, radius * 0.08, 0, Math.PI*2);
+  ctx.fillStyle = '#fff';
+  ctx.fill();
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--primary') || '#C47E2C';
+  ctx.stroke();
+
+  ctx.restore();
+}
+
+/* ---------- Hash helper for consistent hues ---------- */
+function hashCode(s){
+  let h = 0;
+  for (let i = 0; i < s.length; i++) {
+    h = ((h << 5) - h) + s.charCodeAt(i);
+    h |= 0;
+  }
+  return Math.abs(h);
+}
+
+function shorten(s, len) {
+  if (!s) return '';
+  return s.length > len ? s.slice(0, len-1) + '…' : s;
+}
+
+/* ---------- Spin logic (smooth physics-like easing) ---------- */
+/* function to compute delta rotation to land on specific entry index */
+function computeTargetRotationForIndex(index, totalEntries, minFullSpins = 6) {
+  // center of that index (when rotation = 0 and start angle = -PI/2)
+  const angleStep = (Math.PI * 2) / totalEntries;
+  const desiredRotation = - (index + 0.5) * angleStep; // rotation value that centers index at pointer (top)
+  // normalize difference
+  let delta = desiredRotation - rotation;
+  // reduce to -PI..PI
+  delta = ((delta + Math.PI) % (Math.PI*2)) - Math.PI;
+  if (delta < 0) delta += Math.PI*2; // make positive so we spin forward
+  // ensure multiple full spins for flair
+  const extra = (minFullSpins * Math.PI * 2);
+  return rotation + extra + delta;
+}
+
+/* Animates rotation from current 'rotation' to 'target' over duration ms using ease-out */
+function animateRotationTo(target, duration = 3800) {
+  return new Promise(resolve => {
+    const start = rotation;
+    const delta = target - start;
+    const startTime = performance.now();
+    function frame(now) {
+      const t = Math.min(1, (now - startTime) / duration);
+      // smooth cubic ease out
+      const eased = 1 - Math.pow(1 - t, 3);
+      rotation = start + delta * eased;
+      drawWheel();
+      // update progress text
+      spinProgress.textContent = `Spinning... ${(eased*100).toFixed(0)}%`;
+      if (t < 1) requestAnimationFrame(frame);
+      else {
+        spinProgress.textContent = '';
+        resolve();
+      }
+    }
+    requestAnimationFrame(frame);
+  });
+}
+
+/* Given an index within entries array, returns participant object */
+function findParticipantByEntryIndex(idx) {
+  let acc = 0;
+  for (const p of participants) {
+    acc += p.entries;
+    if (idx < acc) return p;
+  }
+  return null;
+}
+
+/* Expand participants into entries list length = totalEntries */
+function totalEntriesCount() {
+  return participants.reduce((s, p) => s + p.entries, 0);
+}
+
+/* choose distinct random indices from 0..totalEntries-1 */
+function chooseDistinctIndices(count) {
+  const total = totalEntriesCount();
+  if (count >= total) {
+    // return all indices shuffled
+    const arr = Array.from({length: total}, (_, i) => i);
+    shuffleArray(arr);
+    return arr;
+  }
+  const chosen = new Set();
+  while (chosen.size < count) {
+    chosen.add(Math.floor(Math.random() * total));
+  }
+  return Array.from(chosen);
+}
+
+/* shuffle utility */
+function shuffleArray(a) {
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i+1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+}
+
+/* Spin wheel for multiple winners: spins sequentially for theatrical pause between winners */
+async function spinWheel() {
+  if (spinning) return;
+  if (!participants.length) return alert('Add participants first.');
+
+  spinning = true;
+  respinBtn.style.display = 'none';
+  const winnersCount = clamp(parseInt(winnersCountInput.value) || 1, 1, 10);
+  const total = totalEntriesCount();
+
+  const indices = chooseDistinctIndices(winnersCount);
+  // sequentially spin to each chosen index
+  for (let k = 0; k < indices.length; k++) {
+    const idx = indices[k];
+    const target = computeTargetRotationForIndex(idx, total, 4 + k); // increase spins for each subsequent winner slightly
+    await animateRotationTo(target, 2000 + Math.min(3000, 600 * (k+1))); // duration scales slightly
+    // find winner participant
+    const winner = findParticipantByEntryIndex(idx);
+    if (winner) {
+      winnersHistory.push(winner);
+      // show confetti & update UI
+      confettiBurst();
+      announceWinner(winner, k+1);
+      renderHistory();
+      renderWinnersUI();
+    }
+    // brief pause between winners
+    await new Promise(r => setTimeout(r, 800));
+  }
+
+  spinning = false;
+  respinBtn.style.display = 'inline-block';
+}
+
+/* ---------- Confetti (per winner) ---------- */
+function confettiBurst() {
+  confetti({
+    particleCount: 120,
+    spread: 100,
+    origin: { y: 0.6 }
+  });
+}
+
+/* display winner in the winner pane (appends in order) */
+function announceWinner(winner, number) {
+  // append to winner display area as badge
+  const el = document.createElement('div');
+  el.className = 'participant-item';
+  el.style.marginTop = '0.5rem';
+  el.innerHTML = `
+    ${winner.image ? `<img src="${escapeHtml(winner.avatarUrl)}" class="participant-avatar">` : ''}
+    <div style="display:flex;flex-direction:column;">
+      <div style="font-weight:700">${escapeHtml(winner.name)}</div>
+      <div class="small">Winner #${winnersHistory.length}</div>
+    </div>
+  `;
+  // add to top
+  winnerListEl.prepend(el);
+}
+
+/* ---------- Helpers ---------- */
+function escapeHtml(s) { return (s||'').toString().replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+/* ---------- Button wiring ---------- */
+spinBtn.addEventListener('click', () => {
+  spinWheel().catch(e => { console.error(e); spinning = false; });
+});
+
+respinBtn.addEventListener('click', () => {
+  // allow quick re-spin using the same participants, but choose new winners
+  spinWheel();
+});
+
+/* ---------- Initial rendering helpers ---------- */
+function renderHistory() {
+  historyEl.innerHTML = '';
+  for (let i = winnersHistory.length - 1; i >= 0; i--) {
+    const w = winnersHistory[i];
+    const row = document.createElement('div');
+    row.className = 'participant-item';
+    row.innerHTML = `
+      ${w.image ? `<img src="${escapeHtml(w.avatarUrl)}" class="participant-avatar">` : ''}
+      <div style="font-weight:600">${escapeHtml(w.name)}</div>
+    `;
+    historyEl.appendChild(row);
+  }
+}
+
+/* ---------- Helper to preload images for existing participants (useful if avatarUrl entered manually) ---------- */
+async function preloadAllParticipantImages() {
+  for (const p of participants) {
+    if (p.avatarUrl && !p.image) {
+      p.image = await loadImage(p.avatarUrl);
+    }
+  }
+}
+
+/* ---------- Utility: shorten long names in wheel rendering already handled by shorten() ---------- */
+
+/* ---------- Start / demo helpers ---------- */
+/* Example helper to add some demo participants (optional) */
+// (commented out) addDemoParticipants();
+
+function addDemoParticipants() {
+  const sample = [
+    {name:'Avi Adler', entries:3, avatarUrl:''},
+    {name:'Maria Gomez', entries:2, avatarUrl:''},
+    {name:'Kwame Nkrumah', entries:1, avatarUrl:''},
+    {name:'Lina Park', entries:4, avatarUrl:''}
+  ];
+  sample.forEach(s => participants.push({...s, id:uid(), image:null}));
+  preloadAllParticipantImages().then(()=>{ renderLeaderboard(); drawWheel(); });
+}
+
+// initial render
+renderLeaderboard();
+renderHistory();
+renderWinnersUI();
+
+/* ---------- small UX: keyboard enter to add ---------- */
+nameInput.addEventListener('keydown', e => { if (e.key === 'Enter') addBtn.click(); });
+
+/* ---------- helpful: recalc when entries changed externally / future features ---------- */
 
 </script>
 </body>

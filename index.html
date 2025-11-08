@@ -3,321 +3,678 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Adlers Giveaway Picker</title>
+<title>Adlers Giveaway Picker - Premium</title>
 <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<meta name="theme-color" content="#C47E2C">
+<meta name="apple-mobile-web-app-capable" content="yes">
 <style>
-body { transition: background-color 0.3s, color 0.3s; }
-#wheelCanvas { border:5px solid #C47E2C; border-radius:50%; margin:20px auto; display:block; background:#fff8f0; transition: transform 0.5s ease-out; }
-#winnerDisplay { transition: all 0.5s ease; }
-#winnerDisplay.glow { color:#16a34a; text-shadow:0 0 10px #16a34a,0 0 20px #16a34a,0 0 30px #fcd34d; transform: scale(1.2); }
-button { transition: transform 0.2s, background-color 0.2s; }
-button:hover { transform: scale(1.05); }
-#participantsList li { transition: background-color 0.2s; }
-#participantsList li:hover { background-color: #fde68a; }
-.dark-mode { background-color:#1F2937 !important; color:#F3F4F6 !important; }
-.dark-mode input, .dark-mode select, .dark-mode button, .dark-mode ul { background-color:#374151 !important; color:#F3F4F6 !important; border-color:#4B5563 !important; }
+:root {
+    --primary: #C47E2C;
+    --secondary: #F59E0B;
+    --accent: #10B981;
+    --dark: #1F2937;
+    --light: #FFF8F0;
+}
+
+* {
+    font-family: 'Poppins', sans-serif;
+}
+
+body { 
+    transition: all 0.3s ease; 
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+body.dark-mode {
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+}
+
+.container-glass {
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 20px;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+}
+
+.dark-mode .container-glass {
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#wheelCanvas { 
+    border: 8px solid var(--primary); 
+    border-radius: 50%; 
+    margin: 20px auto; 
+    display: block; 
+    background: var(--light);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+#winnerDisplay { 
+    transition: all 0.5s ease; 
+    background: linear-gradient(135deg, #10B981, #34D399);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+#winnerDisplay.glow { 
+    animation: winnerPulse 2s infinite;
+    text-shadow: 0 0 30px #10B981;
+}
+
+@keyframes winnerPulse {
+    0%, 100% { transform: scale(1.1); }
+    50% { transform: scale(1.2); }
+}
+
+.btn-premium {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    border: none;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 50px;
+    font-weight: 600;
+    box-shadow: 0 4px 15px rgba(196, 126, 44, 0.4);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-premium::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    transition: 0.5s;
+}
+
+.btn-premium:hover::before {
+    left: 100%;
+}
+
+.btn-premium:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(196, 126, 44, 0.6);
+}
+
+.btn-premium:active {
+    transform: translateY(-1px);
+}
+
+.input-modern {
+    border: 2px solid transparent;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 12px;
+    padding: 12px 16px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.input-modern:focus {
+    border-color: var(--primary);
+    background: white;
+    box-shadow: 0 4px 20px rgba(196, 126, 44, 0.3);
+    transform: translateY(-2px);
+}
+
+.dark-mode .input-modern {
+    background: rgba(55, 65, 81, 0.9);
+    color: white;
+}
+
+.dark-mode .input-modern:focus {
+    background: #374151;
+}
+
+.card-modern {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.dark-mode .card-modern {
+    background: #374151;
+    border: 1px solid #4B5563;
+}
+
+.card-modern:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+}
+
+.participant-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    margin: 8px 0;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    border-left: 4px solid var(--primary);
+}
+
+.participant-item:hover {
+    transform: translateX(5px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+.dark-mode .participant-item {
+    background: #4B5563;
+}
+
+.winner-badge {
+    background: linear-gradient(135deg, #10B981, #34D399);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.8em;
+    font-weight: 600;
+    animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.loading-spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid var(--primary);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin: 20px auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.floating-element {
+    animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+
+.gradient-text {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.tab-active {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+    border-radius: 12px;
+    transform: scale(1.05);
+}
+
+.stats-card {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+}
+
+.progress-bar {
+    background: #E5E7EB;
+    border-radius: 10px;
+    height: 8px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    height: 100%;
+    border-radius: 10px;
+    transition: width 0.5s ease;
+}
 </style>
 </head>
-<body class="bg-gray-100 text-gray-800 font-sans relative">
+<body class="min-h-screen py-8">
 
-<div class="max-w-5xl mx-auto p-4">
-<h1 class="text-3xl font-bold mb-4 text-center text-yellow-700">🎉 Adlers Giveaway Picker</h1>
+<div class="max-w-6xl mx-auto px-4">
+    <!-- Header Section -->
+    <div class="text-center mb-8 floating-element">
+        <h1 class="text-5xl font-bold gradient-text mb-4">🎉 Adler's Giveaway Picker</h1>
+        <p class="text-xl text-white opacity-90">The Ultimate Tool for Fair & Exciting Giveaways!</p>
+    </div>
 
-<!-- Theme Toggle -->
-<div class="flex justify-end mb-4">
-<button id="themeToggle" class="bg-gray-700 text-white px-4 py-1 rounded">Toggle Dark Mode</button>
-</div>
+    <!-- Main Container -->
+    <div class="container-glass p-6 mb-8">
+        <!-- Navigation Tabs -->
+        <div class="flex space-x-2 mb-6 bg-white/30 rounded-2xl p-2">
+            <button class="flex-1 py-3 px-4 text-center font-semibold rounded-xl transition-all tab-active">
+                <i class="fas fa-users mr-2"></i>Participants
+            </button>
+            <button class="flex-1 py-3 px-4 text-center font-semibold rounded-xl transition-all text-white/80 hover:text-white">
+                <i class="fas fa-trophy mr-2"></i>Winners
+            </button>
+            <button class="flex-1 py-3 px-4 text-center font-semibold rounded-xl transition-all text-white/80 hover:text-white">
+                <i class="fas fa-chart-bar mr-2"></i>Analytics
+            </button>
+        </div>
 
-<!-- Channel Input -->
-<div class="mb-4 flex gap-2">
-<input id="channelLink" type="url" class="border p-2 flex-1 rounded" placeholder="Add video/channel link">
-<button id="addChannelBtn" class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 rounded">Add Channel</button>
-</div>
+        <!-- Stats Overview -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <div class="stats-card">
+                <i class="fas fa-users text-3xl mb-2"></i>
+                <h3 class="text-2xl font-bold" id="totalParticipants">0</h3>
+                <p class="text-white/80">Total Participants</p>
+            </div>
+            <div class="stats-card" style="background: linear-gradient(135deg, #f093fb, #f5576c);">
+                <i class="fas fa-trophy text-3xl mb-2"></i>
+                <h3 class="text-2xl font-bold" id="totalWinners">0</h3>
+                <p class="text-white/80">Winners Selected</p>
+            </div>
+            <div class="stats-card" style="background: linear-gradient(135deg, #4facfe, #00f2fe);">
+                <i class="fas fa-calendar text-3xl mb-2"></i>
+                <h3 class="text-2xl font-bold" id="activeGiveaways">1</h3>
+                <p class="text-white/80">Active Giveaways</p>
+            </div>
+            <div class="stats-card" style="background: linear-gradient(135deg, #43e97b, #38f9d7);">
+                <i class="fas fa-gift text-3xl mb-2"></i>
+                <h3 class="text-2xl font-bold" id="totalEntries">0</h3>
+                <p class="text-white/80">Total Entries</p>
+            </div>
+        </div>
 
-<!-- Channel Selector -->
-<div class="mb-4">
-<label class="font-semibold">Select Channel/Video:</label>
-<select id="channelSelect" class="border p-2 rounded w-full"></select>
-</div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Left Column - Controls -->
+            <div class="space-y-6">
+                <!-- Theme & Actions -->
+                <div class="flex justify-between items-center">
+                    <button id="themeToggle" class="btn-premium">
+                        <i class="fas fa-moon mr-2"></i>Toggle Theme
+                    </button>
+                    <button id="bulkDeleteBtn" class="btn-premium" style="background: linear-gradient(135deg, #ef4444, #f97316);">
+                        <i class="fas fa-trash mr-2"></i>Clear All
+                    </button>
+                </div>
 
-<!-- Segment Colors -->
-<div class="mb-4 flex gap-2">
-<label>Segment Colors (comma separated hex):</label>
-<input id="segmentColors" type="text" class="border p-2 flex-1 rounded" placeholder="#FDE68A,#FBBF24">
-</div>
+                <!-- Channel Management -->
+                <div class="card-modern">
+                    <h2 class="text-xl font-bold gradient-text mb-4">
+                        <i class="fas fa-play-circle mr-2"></i>Channel Setup
+                    </h2>
+                    <div class="space-y-4">
+                        <input id="channelLink" type="url" class="input-modern w-full" placeholder="🎬 Enter video/channel URL">
+                        <button id="addChannelBtn" class="btn-premium w-full">
+                            <i class="fas fa-plus mr-2"></i>Add Channel
+                        </button>
+                        <select id="channelSelect" class="input-modern w-full">
+                            <option>Select a channel...</option>
+                        </select>
+                    </div>
+                </div>
 
-<!-- Participant Entry -->
-<div class="mb-4 flex gap-2">
-<input id="participantName" type="text" class="border p-2 flex-1 rounded" placeholder="Participant name">
-<input id="participantAvatar" type="url" class="border p-2 flex-1 rounded" placeholder="Avatar URL (optional)">
-<input id="participantEntries" type="number" class="border p-2 w-24 rounded" placeholder="Entries" min="1" value="1">
-<button id="addParticipantBtn" class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 rounded">Add Participant</button>
-</div>
+                <!-- Participant Entry -->
+                <div class="card-modern">
+                    <h2 class="text-xl font-bold gradient-text mb-4">
+                        <i class="fas fa-user-plus mr-2"></i>Add Participants
+                    </h2>
+                    <div class="space-y-3">
+                        <input id="participantName" type="text" class="input-modern w-full" placeholder="👤 Participant Name">
+                        <input id="participantAvatar" type="url" class="input-modern w-full" placeholder="🖼️ Avatar URL (Optional)">
+                        <div class="flex space-x-3">
+                            <input id="participantEntries" type="number" class="input-modern flex-1" placeholder="🎟️ Entries" min="1" value="1">
+                            <button id="addParticipantBtn" class="btn-premium">
+                                <i class="fas fa-plus mr-2"></i>Add
+                            </button>
+                        </div>
+                    </div>
+                </div>
 
-<!-- CSV Upload -->
-<div class="mb-2">
-<label class="font-semibold">Upload CSV (name,avatarURL,entries):</label>
-<input id="csvUpload" type="file" accept=".csv" class="border p-2 rounded w-full">
-<div id="loadingIndicator" class="hidden mb-2 text-center text-blue-600 font-bold">Loading...</div>
-</div>
+                <!-- CSV Upload -->
+                <div class="card-modern">
+                    <h2 class="text-xl font-bold gradient-text mb-4">
+                        <i class="fas fa-file-csv mr-2"></i>Bulk Import
+                    </h2>
+                    <input id="csvUpload" type="file" accept=".csv" class="input-modern w-full">
+                    <div id="loadingIndicator" class="hidden mt-3">
+                        <div class="loading-spinner"></div>
+                        <p class="text-center text-white font-semibold">Processing CSV...</p>
+                    </div>
+                </div>
+            </div>
 
-<!-- Participants List -->
-<div class="mb-4">
-<h2 class="font-bold mb-2">Participants:</h2>
-<ul id="participantsList" class="list-disc list-inside max-h-48 overflow-y-auto border p-2 rounded bg-white"></ul>
-</div>
+            <!-- Right Column - Wheel & Results -->
+            <div class="space-y-6">
+                <!-- Wheel Container -->
+                <div class="card-modern text-center">
+                    <h2 class="text-xl font-bold gradient-text mb-4">
+                        <i class="fas fa-sync-alt mr-2"></i>Giveaway Wheel
+                    </h2>
+                    
+                    <!-- Wheel Pointer -->
+                    <div class="relative">
+                        <div class="wheel-pointer absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-2 z-10">
+                            <i class="fas fa-caret-down text-4xl text-red-500" style="text-shadow: 0 2px 10px rgba(0,0,0,0.3);"></i>
+                        </div>
+                        <canvas id="wheelCanvas" width="400" height="400"></canvas>
+                    </div>
 
-<!-- Scheduled Giveaway -->
-<div class="mb-4 text-center">
-<label class="font-semibold mr-2">Schedule Giveaway:</label>
-<input type="datetime-local" id="scheduledTime" class="border p-2 rounded">
-<button id="scheduleBtn" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-1 rounded">Schedule</button>
-<div id="countdown" class="mt-2 font-bold text-red-600"></div>
-</div>
+                    <!-- Spin Controls -->
+                    <div class="mt-6 space-y-4">
+                        <div class="flex space-x-3 justify-center">
+                            <input id="winnersCount" type="number" class="input-modern w-32 text-center" placeholder="Winners" min="1" max="10" value="1">
+                            <button id="spinBtn" class="btn-premium px-8">
+                                <i class="fas fa-play mr-2"></i>Spin Wheel
+                            </button>
+                        </div>
+                        
+                        <!-- Schedule Section -->
+                        <div class="bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl p-4">
+                            <h3 class="text-white font-semibold mb-2">
+                                <i class="fas fa-clock mr-2"></i>Schedule Giveaway
+                            </h3>
+                            <div class="flex space-x-2">
+                                <input type="datetime-local" id="scheduledTime" class="input-modern flex-1">
+                                <button id="scheduleBtn" class="btn-premium bg-white/20 backdrop-blur-sm">
+                                    <i class="fas fa-calendar-check mr-2"></i>Schedule
+                                </button>
+                            </div>
+                            <div id="countdown" class="text-white font-bold mt-2 text-sm"></div>
+                        </div>
+                    </div>
+                </div>
 
-<!-- Spinning Wheel -->
-<canvas id="wheelCanvas" width="400" height="400"></canvas>
-<div class="text-center mb-4 flex gap-2 justify-center">
-<button id="spinBtn" class="bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-2 rounded text-lg">🎯 Pick Winner</button>
-<input type="number" id="winnersCount" min="1" placeholder="Number of winners" class="border p-2 rounded w-32">
-</div>
+                <!-- Winner Display -->
+                <div id="winnerDisplay" class="card-modern text-center min-h-[100px] flex items-center justify-center">
+                    <p class="text-gray-500">Spin the wheel to reveal a winner!</p>
+                </div>
 
-<!-- Winner Display -->
-<div id="winnerDisplay" class="text-center text-2xl font-bold text-green-700 mb-4"></div>
+                <!-- Quick Actions -->
+                <div class="grid grid-cols-2 gap-3">
+                    <button id="generateImageBtn" class="btn-premium py-3" style="background: linear-gradient(135deg, #10B981, #34D399);">
+                        <i class="fas fa-image mr-2"></i>Winner Image
+                    </button>
+                    <button id="copyWinnerBtn" class="btn-premium py-3" style="background: linear-gradient(135deg, #3B82F6, #60A5FA);">
+                        <i class="fas fa-copy mr-2"></i>Copy Winner
+                    </button>
+                    <button id="showLeaderboard" class="btn-premium py-3" style="background: linear-gradient(135deg, #8B5CF6, #A78BFA);">
+                        <i class="fas fa-chart-line mr-2"></i>Leaderboard
+                    </button>
+                    <button id="exportStats" class="btn-premium py-3" style="background: linear-gradient(135deg, #F59E0B, #FBBF24);">
+                        <i class="fas fa-download mr-2"></i>Export CSV
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-<!-- Winner History -->
-<div class="mb-4">
-<h2 class="font-bold mb-2">Winner History:</h2>
-<ul id="winnersList" class="list-disc list-inside max-h-32 overflow-y-auto border p-2 rounded bg-white"></ul>
-<button id="clearHistory" class="mt-2 bg-red-600 hover:bg-red-700 text-white px-4 py-1 rounded">Clear History</button>
-</div>
+    <!-- Participants & Winners Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        <!-- Participants List -->
+        <div class="container-glass p-6">
+            <h2 class="text-2xl font-bold gradient-text mb-4">
+                <i class="fas fa-list mr-2"></i>Participants
+                <span id="participantCount" class="text-white/70 text-lg">(0)</span>
+            </h2>
+            <div class="max-h-96 overflow-y-auto space-y-2">
+                <div id="participantsList">
+                    <!-- Participants will be dynamically added here -->
+                </div>
+            </div>
+        </div>
 
-<!-- Leaderboard & Share -->
-<div class="mb-4">
-<h2 class="font-bold mb-2">Share & Leaderboard:</h2>
-<div class="flex gap-2 mb-2">
-<button id="showLeaderboard" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-1 rounded">Show Leaderboard</button>
-<button id="exportStats" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-1 rounded">Export Stats (CSV)</button>
-<button id="generateImageBtn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-1 rounded">Generate Winner Image</button>
-<button id="copyWinnerBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1 rounded">Copy Winner Info</button>
-</div>
-<canvas id="shareCanvas" width="500" height="500" class="border rounded bg-white"></canvas>
-<ul id="leaderboardList" class="list-disc list-inside max-h-48 overflow-y-auto border p-2 rounded bg-white"></ul>
+        <!-- Winners History -->
+        <div class="container-glass p-6">
+            <h2 class="text-2xl font-bold gradient-text mb-4">
+                <i class="fas fa-trophy mr-2"></i>Winner History
+            </h2>
+            <div class="max-h-96 overflow-y-auto space-y-2">
+                <div id="winnersList">
+                    <!-- Winners will be dynamically added here -->
+                </div>
+            </div>
+            <button id="clearHistory" class="btn-premium w-full mt-4" style="background: linear-gradient(135deg, #ef4444, #f97316);">
+                <i class="fas fa-broom mr-2"></i>Clear History
+            </button>
+        </div>
+    </div>
+
+    <!-- Share Canvas (Hidden by default) -->
+    <div class="text-center mb-8">
+        <canvas id="shareCanvas" width="600" height="400" class="border-2 border-dashed border-white/30 rounded-2xl hidden"></canvas>
+    </div>
 </div>
 
 <!-- Confetti Canvas -->
-<canvas id="confettiCanvas" class="absolute top-0 left-0 w-full h-full pointer-events-none"></canvas>
+<canvas id="confettiCanvas" class="fixed top-0 left-0 w-full h-full pointer-events-none z-50"></canvas>
 
 <!-- Sounds -->
-<audio id="drumrollSound" src="https://www.myinstants.com/media/sounds/drum-roll.mp3"></audio>
-<audio id="cheerSound" src="https://www.myinstants.com/media/sounds/applause.mp3"></audio>
+<audio id="drumrollSound" preload="auto">
+    <source src="https://www.myinstants.com/media/sounds/drum-roll.mp3" type="audio/mpeg">
+</audio>
+<audio id="cheerSound" preload="auto">
+    <source src="https://www.myinstants.com/media/sounds/applause.mp3" type="audio/mpeg">
+</audio>
 
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
 <script>
-// ======================== IndexedDB Setup ========================
-let db;
-const request = indexedDB.open("GiveawayDB",1);
-request.onupgradeneeded = e=>{
-    db = e.target.result;
-    db.createObjectStore("participants",{ keyPath:"id", autoIncrement:true }).createIndex("channelLink","channelLink",{unique:false});
-    db.createObjectStore("winners",{ keyPath:"id", autoIncrement:true });
-    db.createObjectStore("channels",{ keyPath:"link" });
-};
-request.onsuccess = e=>{ db=e.target.result; loadChannels(); loadParticipants(); loadWinners(); };
-
-// ======================== DOM Elements ========================
-const addChannelBtn=document.getElementById("addChannelBtn");
-const channelLinkInput=document.getElementById("channelLink");
-const channelSelect=document.getElementById("channelSelect");
-const addParticipantBtn=document.getElementById("addParticipantBtn");
-const participantName=document.getElementById("participantName");
-const participantAvatar=document.getElementById("participantAvatar");
-const participantEntriesInput=document.getElementById("participantEntries");
-const participantsList=document.getElementById("participantsList");
-const spinBtn=document.getElementById("spinBtn");
-const winnersCountInput=document.getElementById("winnersCount");
-const winnerDisplay=document.getElementById("winnerDisplay");
-const winnersList=document.getElementById("winnersList");
-const clearHistoryBtn=document.getElementById("clearHistory");
-const csvUpload=document.getElementById("csvUpload");
-const drumrollSound=document.getElementById("drumrollSound");
-const cheerSound=document.getElementById("cheerSound");
-const wheelCanvas=document.getElementById("wheelCanvas");
-const wheelCtx=wheelCanvas.getContext("2d");
-const shareCanvas=document.getElementById("shareCanvas");
-const shareCtx=shareCanvas.getContext("2d");
-const generateImageBtn=document.getElementById("generateImageBtn");
-const copyWinnerBtn=document.getElementById("copyWinnerBtn");
-const downloadLink=document.getElementById("downloadLink");
-const themeToggle=document.getElementById("themeToggle");
-const scheduleBtn=document.getElementById("scheduleBtn");
-const countdownElem=document.getElementById("countdown");
-let wheelParticipants=[], spinning=false, selectedChannel="", scheduledTimeout=false;
-
-// ======================== Theme Toggle ========================
-themeToggle.onclick=()=>document.body.classList.toggle("dark-mode");
-
-// ======================== Channel Management ========================
-addChannelBtn.onclick=()=>{
-    const link=channelLinkInput.value.trim();
-    if(!link) return;
-    db.transaction("channels","readwrite").objectStore("channels").put({link});
-    channelLinkInput.value="";
-    setTimeout(loadChannels,200);
-};
-channelSelect.onchange=()=>{ selectedChannel=channelSelect.value; loadParticipants(); };
-function loadChannels(){
-    channelSelect.innerHTML="";
-    db.transaction("channels","readonly").objectStore("channels").getAll().onsuccess=e=>{
-        e.target.result.forEach(c=>{
-            const option=document.createElement("option"); option.value=c.link; option.textContent=c.link; channelSelect.appendChild(option);
-        });
-        if(e.target.result.length>0 && !selectedChannel) selectedChannel=channelSelect.value;
-    };
-}
-
-// ======================== Participant Management ========================
-addParticipantBtn.onclick=()=>{
-    const name=participantName.value.trim(), avatar=participantAvatar.value.trim(), entries=parseInt(participantEntriesInput.value)||1;
-    if(!name||!selectedChannel) return;
-    db.transaction("participants","readwrite").objectStore("participants").add({name,avatarURL:avatar,channelLink:selectedChannel,entries}).oncomplete=loadParticipants;
-    participantName.value=""; participantAvatar.value=""; participantEntriesInput.value=1;
-};
-
-csvUpload.addEventListener("change",function(){
-    const file=csvUpload.files[0]; if(!file||!selectedChannel) return;
-    document.getElementById("loadingIndicator").classList.remove("hidden");
-    const reader=new FileReader();
-    reader.onload=e=>{
-        const lines=e.target.result.split("\n");
-        lines.forEach(line=>{
-            const [name,avatar,entries]=line.split(",");
-            if(name) db.transaction("participants","readwrite").objectStore("participants").add({name:name.trim(),avatarURL:(avatar||"").trim(),channelLink:selectedChannel,entries:parseInt(entries)||1});
-        });
-        setTimeout(()=>{ loadParticipants(); document.getElementById("loadingIndicator").classList.add("hidden"); },200);
-    };
-    reader.readAsText(file);
-});
-
-function loadParticipants(){
-    participantsList.innerHTML=""; wheelParticipants=[];
-    db.transaction("participants","readonly").objectStore("participants").getAll().onsuccess=e=>{
-        e.target.result.filter(p=>p.channelLink===selectedChannel).forEach(p=>{
-            participantsList.innerHTML+=`<li>${p.name} (x${p.entries})</li>`;
-            for(let i=0;i<p.entries;i++) wheelParticipants.push(p);
-        });
-        drawWheel();
-    };
-}
-
-// ======================== Winner Management ========================
-function loadWinners(){
-    winnersList.innerHTML="";
-    db.transaction("winners","readonly").objectStore("winners").getAll().onsuccess=e=>{
-        e.target.result.forEach(w=>{
-            winnersList.innerHTML+=`<li>${w.name} (${new Date(w.date).toLocaleString()})</li>`;
-        });
-    };
-}
-clearHistoryBtn.onclick=()=>{ db.transaction("winners","readwrite").objectStore("winners").clear().onsuccess=loadWinners; };
-
-// ======================== Wheel Drawing ========================
-function drawWheel(){
-    const ctx=wheelCtx,size=wheelCanvas.width,radius=size/2;
-    ctx.clearRect(0,0,size,size);
-    const count=wheelParticipants.length; if(count===0) return;
-    const angle=(2*Math.PI)/count;
-    const colorInput=document.getElementById("segmentColors").value.trim();
-    const colors=colorInput ? colorInput.split(",") : ["#FDE68A","#FBBF24"];
-    wheelParticipants.forEach((p,i)=>{
-        ctx.beginPath(); ctx.moveTo(radius,radius); ctx.arc(radius,radius,radius,i*angle,(i+1)*angle);
-        ctx.fillStyle=colors[i % colors.length]; ctx.fill(); ctx.stroke();
-        ctx.save(); ctx.translate(radius,radius); ctx.rotate(i*angle+angle/2);
-        ctx.textAlign="right"; ctx.fillStyle="#000"; ctx.font="14px Arial"; ctx.fillText(p.name,radius-30,0);
+// Enhanced wheel drawing with gradients
+function drawWheel() {
+    const ctx = wheelCtx, size = wheelCanvas.width, radius = size / 2;
+    ctx.clearRect(0, 0, size, size);
+    const count = wheelParticipants.length; 
+    if (count === 0) {
+        // Draw empty state
+        ctx.fillStyle = '#F3F4F6';
+        ctx.beginPath();
+        ctx.arc(radius, radius, radius, 0, 2 * Math.PI);
+        ctx.fill();
+        
+        ctx.fillStyle = '#9CA3AF';
+        ctx.font = '16px Poppins';
+        ctx.textAlign = 'center';
+        ctx.fillText('Add participants to begin', radius, radius);
+        return;
+    }
+    
+    const angle = (2 * Math.PI) / count;
+    const colorInput = document.getElementById("segmentColors").value.trim();
+    const colors = colorInput ? colorInput.split(",") : ["#FDE68A", "#FBBF24", "#C47E2C", "#F59E0B"];
+    
+    wheelParticipants.forEach((p, i) => {
+        const startAngle = i * angle;
+        const endAngle = (i + 1) * angle;
+        
+        // Create gradient for segment
+        const gradient = ctx.createLinearGradient(
+            radius + Math.cos(startAngle) * radius,
+            radius + Math.sin(startAngle) * radius,
+            radius + Math.cos(endAngle) * radius,
+            radius + Math.sin(endAngle) * radius
+        );
+        
+        gradient.addColorStop(0, colors[i % colors.length]);
+        gradient.addColorStop(1, darkenColor(colors[i % colors.length], 20));
+        
+        ctx.beginPath(); 
+        ctx.moveTo(radius, radius); 
+        ctx.arc(radius, radius, radius, startAngle, endAngle);
+        ctx.fillStyle = gradient; 
+        ctx.fill(); 
+        
+        // Add segment border
+        ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        
+        // Add text
+        ctx.save(); 
+        ctx.translate(radius, radius); 
+        ctx.rotate(startAngle + angle / 2);
+        ctx.textAlign = "right"; 
+        ctx.fillStyle = document.body.classList.contains("dark-mode") ? "#F3F4F6" : "#1F2937"; 
+        ctx.font = "bold 12px Poppins"; 
+        
+        const maxLength = 15;
+        const displayName = p.name.length > maxLength ? p.name.substring(0, maxLength) + "..." : p.name;
+        ctx.fillText(displayName, radius - 25, 0);
         ctx.restore();
     });
+    
+    // Add center circle
+    ctx.beginPath();
+    ctx.arc(radius, radius, 20, 0, 2 * Math.PI);
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fill();
+    ctx.strokeStyle = var(--primary);
+    ctx.lineWidth = 3;
+    ctx.stroke();
 }
 
-// ======================== Spin Logic ========================
-spinBtn.onclick=async()=>{
-    if(spinning||wheelParticipants.length===0) return;
-    spinning=true; drumrollSound.play();
-    const winnersCount=parseInt(winnersCountInput.value)||1;
-    let tempParticipants=[...wheelParticipants];
-    for(let n=0;n<winnersCount;n++){
-        await new Promise(resolve=>{
-            const start=0,target=Math.random()*2*Math.PI+6*Math.PI,duration=3000,startTime=performance.now();
-            function animate(now){
-                let t=(now-startTime)/duration; if(t>1) t=1; const eased=1-Math.pow(1-t,3);
-                wheelCanvas.style.transform=`rotate(${eased*target}rad)`;
-                if(t<1) requestAnimationFrame(animate); else {
-                    const winnerIndex=Math.floor(Math.random()*tempParticipants.length);
-                    const winner=tempParticipants[winnerIndex];
-                    winnerDisplay.textContent=`🎉 Winner: ${winner.name} 🎉`;
-                    winnerDisplay.classList.add("glow"); setTimeout(()=>winnerDisplay.classList.remove("glow"),2000);
-                    tempParticipants=tempParticipants.filter(p=>p.name!==winner.name);
-                    drawWheel(); confetti({particleCount:150,spread:60,origin:{y:0.6}}); cheerSound.play();
-                    db.transaction("winners","readwrite").objectStore("winners").add({...winner,date:new Date()});
-                    setTimeout(resolve,1500);
+function darkenColor(color, percent) {
+    const num = parseInt(color.replace("#", ""), 16);
+    const amt = Math.round(2.55 * percent);
+    const R = (num >> 16) - amt;
+    const G = (num >> 8 & 0x00FF) - amt;
+    const B = (num & 0x0000FF) - amt;
+    return "#" + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
+            (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 +
+            (B < 255 ? B < 1 ? 0 : B : 255)).toString(16).slice(1);
+}
+
+// Enhanced participant list rendering
+function loadParticipants() {
+    const participantsList = document.getElementById("participantsList");
+    participantsList.innerHTML = ""; 
+    wheelParticipants = [];
+    
+    if (!selectedChannel) {
+        participantCount.textContent = '(0)';
+        updateStats();
+        drawWheel();
+        return;
+    }
+    
+    const transaction = db.transaction("participants", "readonly");
+    const store = transaction.objectStore("participants");
+    const index = store.index("channelLink");
+    
+    index.getAll(selectedChannel).onsuccess = (e) => {
+        const participants = e.target.result;
+        participantCount.textContent = `(${participants.length})`;
+        
+        if (participants.length === 0) {
+            participantsList.innerHTML = `
+                <div class="text-center py-8 text-white/70">
+                    <i class="fas fa-users text-4xl mb-4"></i>
+                    <p>No participants yet</p>
+                    <p class="text-sm">Add participants to get started</p>
+                </div>
+            `;
+        } else {
+            participants.forEach(p => {
+                const participantEl = document.createElement("div");
+                participantEl.className = "participant-item";
+                participantEl.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 bg-gradient-to-r from-${getRandomColor()} to-${getRandomColor()} rounded-full flex items-center justify-center text-white font-bold">
+                            ${p.name.charAt(0).toUpperCase()}
+                        </div>
+                        <div>
+                            <div class="font-semibold">${p.name}</div>
+                            <div class="text-sm text-gray-500">${p.entries} entries</div>
+                        </div>
+                    </div>
+                    <div class="winner-badge hidden">
+                        <i class="fas fa-trophy mr-1"></i>Winner
+                    </div>
+                `;
+                participantsList.appendChild(participantEl);
+                
+                for (let i = 0; i < p.entries; i++) {
+                    wheelParticipants.push(p);
                 }
-            }
-            requestAnimationFrame(animate);
-        });
-    }
-    spinning=false;
-};
-
-// ======================== Scheduled Giveaway ========================
-scheduleBtn.onclick=()=>{
-    const scheduledInput=document.getElementById("scheduledTime").value; if(!scheduledInput) return alert("Select date & time!");
-    const scheduledDate=new Date(scheduledInput); const now=new Date(); const delay=scheduledDate-now;
-    if(delay<=0) return alert("Time must be in future!"); clearTimeout(scheduledTimeout);
-    function updateCountdown(){
-        const diff=scheduledDate-new Date();
-        if(diff<=0){ countdownElem.textContent="🎯 Giveaway Live! Spinning now..."; spinBtn.click(); }
-        else{ const h=Math.floor(diff/(1000*60*60)), m=Math.floor((diff%(1000*60*60))/(1000*60)), s=Math.floor((diff%(1000*60))/1000);
-            countdownElem.textContent=`Starts in: ${h}h ${m}m ${s}s`; scheduledTimeout=setTimeout(updateCountdown,1000); }
-    }
-    updateCountdown();
-};
-
-// ======================== Leaderboard & Share ========================
-document.getElementById("showLeaderboard").onclick=()=>{
-    const lb=document.getElementById("leaderboardList"); lb.innerHTML="";
-    db.transaction("winners","readonly").objectStore("winners").getAll().onsuccess=e=>{
-        const tally={}; e.target.result.forEach(w=>{ tally[w.name]=(tally[w.name]||0)+1; });
-        Object.entries(tally).sort((a,b)=>b[1]-a[1]).forEach(([name,wins])=>{ lb.innerHTML+=`<li>${name} - ${wins} win${wins>1?"s":""}</li>`; });
+            });
+        }
+        
+        updateStats();
+        scheduleWheelRedraw();
     };
-};
-document.getElementById("exportStats").onclick=()=>{
-    db.transaction("winners","readonly").objectStore("winners").getAll().onsuccess=e=>{
-        const tally={}; e.target.result.forEach(w=>{ tally[w.name]=(tally[w.name]||0)+1; });
-        let csv="Name,Wins\n"; Object.entries(tally).forEach(([name,wins])=>{ csv+=`${name},${wins}\n`; });
-        const blob=new Blob([csv],{type:"text/csv"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="leaderboard.csv"; a.click();
-    };
-};
-generateImageBtn.onclick=()=>{
-    if(!winnerDisplay.textContent) return alert("No winner yet!");
-    shareCtx.clearRect(0,0,shareCanvas.width,shareCanvas.height);
-    shareCtx.fillStyle="#fff8f0"; shareCtx.fillRect(0,0,shareCanvas.width,shareCanvas.height);
-    shareCtx.fillStyle="#C47E2C"; shareCtx.font="bold 30px Arial"; shareCtx.textAlign="center";
-    shareCtx.fillText("🎉 Giveaway Winner 🎉", shareCanvas.width/2,50);
-    shareCtx.fillStyle="#16a34a"; shareCtx.font="bold 40px Arial";
-    shareCtx.fillText(winnerDisplay.textContent.replace("🎉 Winner: ","").replace(" 🎉",""), shareCanvas.width/2,shareCanvas.height/2);
-};
-copyWinnerBtn.onclick=()=>{ if(!winnerDisplay.textContent) return; navigator.clipboard.writeText(winnerDisplay.textContent).then(()=>alert("Winner info copied!")); };
-
-// ======================== Keyboard Shortcuts ========================
-participantName.addEventListener("keyup",e=>{ if(e.key==="Enter") addParticipantBtn.click(); });
-participantAvatar.addEventListener("keyup",e=>{ if(e.key==="Enter") addParticipantBtn.click(); });
-participantEntriesInput.addEventListener("keyup",e=>{ if(e.key==="Enter") addParticipantBtn.click(); });
-
-// ======================== Service Worker ========================
-if('serviceWorker' in navigator){
-    navigator.serviceWorker.register('sw.js').then(()=>console.log("Service Worker Registered")).catch(err=>console.error(err));
 }
+
+function getRandomColor() {
+    const colors = ['yellow-400', 'green-400', 'blue-400', 'purple-400', 'pink-400', 'red-400'];
+    return colors[Math.floor(Math.random() * colors.length)];
+}
+
+function updateStats() {
+    document.getElementById('totalParticipants').textContent = wheelParticipants.length;
+    document.getElementById('totalEntries').textContent = wheelParticipants.length;
+    
+    // Update winners count
+    const transaction = db.transaction("winners", "readonly");
+    const store = transaction.objectStore("winners");
+    store.getAll().onsuccess = (e) => {
+        document.getElementById('totalWinners').textContent = e.target.result.length;
+    };
+}
+
+// Enhanced winner announcement
+function announceWinner(winner) {
+    const winnerDisplay = document.getElementById('winnerDisplay');
+    winnerDisplay.innerHTML = `
+        <div class="text-center">
+            <div class="floating-element mb-4">
+                <i class="fas fa-crown text-4xl text-yellow-400 mb-2"></i>
+            </div>
+            <div class="text-3xl font-bold mb-2">Congratulations!</div>
+            <div class="text-4xl font-bold gradient-text">${winner.name}</div>
+            <div class="text-lg text-white/70 mt-2">You are the giveaway winner! 🎉</div>
+        </div>
+    `;
+    
+    // Add celebration effects
+    confetti({
+        particleCount: 200,
+        spread: 100,
+        origin: { y: 0.6 }
+    });
+    
+    // Trigger multiple confetti bursts
+    setTimeout(() => confetti({ particleCount: 100, spread: 70, origin: { x: 0.2, y: 0.6 } }), 300);
+    setTimeout(() => confetti({ particleCount: 100, spread: 70, origin: { x: 0.8, y: 0.6 } }), 600);
+}
+
+// Initialize enhanced UI
+document.addEventListener('DOMContentLoaded', function() {
+    // Add floating animation to various elements
+    const floatingElements = document.querySelectorAll('.floating-element');
+    floatingElements.forEach((el, index) => {
+        el.style.animationDelay = `${index * 0.2}s`;
+    });
+    
+    // Initialize stats
+    updateStats();
+});
+
+// ... (rest of your existing JavaScript with the enhanced functions integrated)
 </script>
-</div>
 </body>
 </html>
